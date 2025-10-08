@@ -81,6 +81,7 @@ summary{cursor:pointer}
       <label><small class="muted">Tools</small></label><br>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
         <button id="btnCopyMonth">Repeat this month → all months (weekdays)</button>
+        <button id="btnCopyYearRange">Repeat this year → year range</button>
         <button id="btnExportHtml">Export month as printable HTML</button>
         <button id="btnExportCSV">Export placements CSV</button>
         <input type="file" id="fileImport" accept=".csv" style="display:none">
@@ -494,15 +495,79 @@ function boot(){
   $("#btnApplyRepeat").addEventListener("click", applyRecurrence);
 
   // Seed modal
-  const modal=$("#seedModal"), openSeed=()=>modal.style.display="flex", closeSeed=()=>modal.style.display="none";
+  const modal = $("#seedModal"),
+        openSeed = () => (modal.style.display = "flex"),
+        closeSeed = () => (modal.style.display = "none");
   $("#btnSeedCSV").addEventListener("click", openSeed);
   $("#seedCancel").addEventListener("click", closeSeed);
-  $("#seedApply").addEventListener("click", ()=>{
-    const text=$("#seedText").value.trim(); if(!text){ closeSeed(); return; }
-    applyCSV(text); closeSeed();
+  $("#seedApply").addEventListener("click", () => {
+    const text = $("#seedText").value.trim();
+    if (!text) { closeSeed(); return; }
+    applyCSV(text);
+    closeSeed();
     msg("Seeded from pasted CSV.");
   });
+
+  // 🔁 Repeat this year → year range
+  const yrBtn = $("#btnCopyYearRange");
+  if (yrBtn) {
+    yrBtn.addEventListener("click", () => {
+      const y = Number($("#yearSel").value);
+      const ans = prompt(
+        `Copy the entire ${y} schedule to which year range? (e.g. 2026-2030)`,
+        "2026-2030"
+      );
+      if (!ans) return;
+      const m = ans.match(/^(\d{4})\s*-\s*(\d{4})$/);
+      if (!m) { msg("Use format YYYY-YYYY"); return; }
+      const startY = Number(m[1]), endY = Number(m[2]);
+      if (startY > endY) { msg("Start year must be ≤ end year"); return; }
+      copyYearToRange(y, startY, endY);
+    });
+  }
+} // ← end of boot()
+
+// ======= Copy the whole year to a range (weekdays only, holiday-shifted) =======
+function copyYearToRange(fromYear, startYear, endYear) {
+  for (let y = startYear; y <= endYear; y++) {
+    if (y === fromYear) continue;
+    for (let m = 1; m <= 12; m++) {
+      const srcKey = mkey(fromYear, m);
+      const src = state.months[srcKey] || {};
+      const tgtKey = mkey(y, m);
+      state.months[tgtKey] = {};
+
+      for (const ds in src) {
+        // keep day-of-month where possible; shift off weekends & holidays
+        const d = parseYMD(ds);
+        let tgt = new Date(y, m - 1, d.getDate());
+
+        // weekend shift (Sun forward, Sat back)
+        while (isWE(tgt)) {
+          tgt.setDate(tgt.getDate() + (tgt.getDay() === 0 ? 1 : -1));
+        }
+
+        let tStr = ymd(tgt);
+
+        // holiday shift to previous business day
+        const H = holidayMap(y);
+        if (H[tStr]) {
+          tgt = prevBiz(tgt, H);
+          tStr = ymd(tgt);
+        }
+
+        // deep copy the slots for that source day
+        state.months[tgtKey][tStr] = JSON.parse(JSON.stringify(src[ds]));
+      }
+    }
+  }
+  save();
+  renderMonth();
+  renderTable();
+  msg(`Copied ${fromYear} to ${startYear}–${endYear} (weekdays only, holiday-shifted).`);
 }
+
+// boot the app
 boot();
 </script>
 </body>
