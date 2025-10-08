@@ -1,141 +1,58 @@
-:root{
-  /* Light theme */
-  --bg:#f4f6fb;
-  --card:#ffffff;
-  --ring:#d6d9e0;
-  --text:#0b0f14;
-  --muted:#586173;
-  --accent:#2563eb;
-  --grid:#e5e7eb;
-}
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Outage Planner</title>
 
+<!-- ========== LIGHT THEME CSS ========== -->
+<style>
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --ring:#d6d9e0; --text:#0b0f14;
+  --muted:#586173; --accent:#2563eb; --grid:#e5e7eb;
+}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-}
+body{margin:0;background:var(--bg);color:var(--text);
+     font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial}
 .wrap{max-width:1280px;margin:18px auto;padding:0 16px}
 h1{margin:0 0 10px;font-size:24px}
 small.muted{color:var(--muted)}
 
-.card{
-  background:var(--card);
-  border:1px solid var(--ring);
-  border-radius:14px;
-  padding:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,.05);
-}
-
-button{
-  background:#eef2ff;
-  color:#0b0f14;
-  border:1px solid var(--ring);
-  border-radius:10px;
-  padding:8px 10px;
-  cursor:pointer;
-}
+.card{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+button{background:#eef2ff;color:#0b0f14;border:1px solid var(--ring);border-radius:10px;padding:8px 10px;cursor:pointer}
 button.primary{background:var(--accent);border-color:transparent;color:#fff}
 button[disabled]{opacity:.5;cursor:not-allowed}
-
-select, textarea{
-  background:#fff;
-  border:1px solid var(--ring);
-  color:var(--text);
-  border-radius:8px;
-  padding:6px 8px;
-}
+select,textarea{background:#fff;border:1px solid var(--ring);color:var(--text);border-radius:8px;padding:6px 8px}
 textarea{width:100%;min-height:180px}
-
 .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
 .viewtabs{margin-top:8px;display:flex;gap:8px}
 .viewtabs button.active{background:var(--accent);border-color:transparent;color:#fff}
-
 .grid{display:grid;grid-template-columns:320px 1fr;gap:12px}
 
-/* Palette */
-.palette{
-  background:var(--card);
-  border:1px solid var(--ring);
-  border-radius:14px;
-  padding:10px;
-  max-height:72vh;
-  overflow:auto;
-}
+.palette{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px;max-height:72vh;overflow:auto}
 .palette header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-
-.taskchip{
-  display:flex;align-items:center;gap:8px;
-  padding:6px 8px;border-radius:10px;
-  border-left:6px solid var(--accent);
-  background:#fbfdff;
-  border:1px solid var(--ring);
-  margin:6px 0;cursor:grab;
-  color:var(--text);
-}
+.taskchip{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;border-left:6px solid var(--accent);background:#fbfdff;border:1px solid var(--ring);margin:6px 0;cursor:grab;color:var(--text)}
 .taskchip .colorbox{width:16px;height:16px;border-radius:4px;border:1px solid var(--ring)}
-
 .badge{display:inline-block;padding:2px 6px;border-radius:999px;border:1px solid var(--ring);font-size:12px;background:#fff}
 .banner{margin:10px 0;padding:8px;border-radius:10px;border:1px solid var(--ring)}
 .info{background:#f6f8ff}
 .error{background:#fff1f2;border-color:#fecdd3;color:#7f1d1d}
 
-/* Calendar */
-.calendar{
-  background:var(--card);
-  border:1px solid var(--ring);
-  border-radius:14px;
-  padding:10px;
-}
+.calendar{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px}
 .weekdays{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:6px}
 .weekgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-
-.day{
-  border:1px solid var(--ring);
-  border-radius:10px;
-  min-height:120px;
-  padding:8px;
-  background:#ffffff;           /* light day cell */
-  position:relative;
-  box-shadow:0 1px 4px rgba(0,0,0,.04);
-}
+.day{border:1px solid var(--ring);border-radius:10px;min-height:120px;padding:8px;background:#fff;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .day .date{position:absolute;top:6px;right:8px;font-size:12px;color:#6b7280}
-.day .holabel{
-  position:absolute;top:6px;left:8px;font-size:11px;color:#7a5200;
-  background:#fffbe6;border:1px solid #ffe58f;border-radius:6px;padding:2px 6px
-}
-
-/* AM/PM slots */
-.slot{
-  border:1px dashed var(--grid);
-  border-radius:8px;
-  padding:6px;
-  min-height:38px;
-  margin-top:8px;
-  background:#fafcff;           /* light slot background */
-}
+.day .holabel{position:absolute;top:6px;left:8px;font-size:11px;color:#7a5200;background:#fffbe6;border:1px solid #ffe58f;border-radius:6px;padding:2px 6px}
+.slot{border:1px dashed var(--grid);border-radius:8px;padding:6px;min-height:38px;margin-top:8px;background:#fafcff}
 .slot-title{font-size:11px;color:#6b7280}
 .dropzone{min-height:24px}
 
-/* Task entries on the calendar */
-.entry{
-  margin-top:4px;padding:4px 8px;border-radius:8px;
-  border-left:5px solid var(--accent);
-  background:#ffffff !important;     /* light entry card */
-  color:#000 !important;
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  border:1px solid var(--ring);
-  box-shadow:0 1px 3px rgba(0,0,0,.06);
-  font-weight:600;
-}
+.entry{margin-top:4px;padding:4px 8px;border-radius:8px;border-left:5px solid var(--accent);background:#fff !important;color:#000 !important;display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--ring);box-shadow:0 1px 3px rgba(0,0,0,.06);font-weight:600}
 .entry .x{cursor:pointer;font-weight:bold;color:#334155}
+.entry[style*="#ff0000"]{color:#fff !important} /* red bg → white text */
 
-/* Auto-contrast: if inline style sets bg to red, flip text to white */
-.entry[style*="#ff0000"]{ color:#ffffff !important; }
-
-/* Table export view */
 .tablewrap{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px}
 table{width:100%;border-collapse:collapse;background:#fff}
 thead th{font-size:12px;color:#475569;text-align:left;border-bottom:1px solid var(--ring);padding:8px;background:#f7f8fb}
@@ -145,6 +62,554 @@ tbody td{padding:8px;border-bottom:1px dashed var(--grid);color:#0b0f14}
 .controls-row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 summary{cursor:pointer}
 
-/* Modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
-.modal .inner{background:#ffffff;border:1px solid var(--ring);border-radius:12px;max-width:720px;width:100%;padding:12px;color:#0b0f14}
+.modal .inner{background:#fff;border:1px solid var(--ring);border-radius:12px;max-width:760px;width:100%;padding:12px;color:#0b0f14}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <h1>Outage Planner</h1>
+
+  <div class="toolbar">
+    <div class="card">
+      <div class="controls-row">
+        <div>
+          <label><small class="muted">Year</small></label><br>
+          <select id="yearSel"></select>
+        </div>
+        <div>
+          <label><small class="muted">Month</small></label><br>
+          <select id="monthSel"></select>
+        </div>
+      </div>
+      <div class="viewtabs">
+        <button id="tabMonth" class="active">Month view</button>
+        <button id="tabTable">Table view</button>
+      </div>
+      <div class="banner info"><small class="muted">
+        Drag from palette or move existing entries. Weekends are excluded.
+        Holidays are labeled (observed days included) in <b>yellow</b>. If a
+        task lands on a holiday it shifts to the <b>previous business day</b>.
+        More than two items spill into an <b>EXTRA</b> stack. Empty weekdays export as <b>gray</b>.
+      </small></div>
+    </div>
+
+    <div class="card">
+      <label><small class="muted">Tools</small></label><br>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+        <button id="btnCopyMonth">Repeat this month → all months (weekdays)</button>
+        <button id="btnCopyYearRange">Repeat this year → year range</button>
+        <button id="btnExportHtml">Export month as printable HTML</button>
+        <button id="btnExportCSV">Export placements CSV</button>
+        <input type="file" id="fileImport" accept=".csv" style="display:none">
+        <button id="btnImportCSV">Import placements CSV</button>
+        <button id="btnSeedCSV">Paste seed CSV</button>
+        <button id="btnReset">Reset month</button>
+      </div>
+      <div id="msg" class="banner error" style="display:none;margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="palette">
+      <header>
+        <strong>Task palette</strong>
+        <div style="display:flex;gap:6px">
+          <button id="btnAdd">+ Add</button>
+          <button id="btnEditPalette">Edit palette</button>
+        </div>
+      </header>
+
+      <details style="margin-bottom:8px">
+        <summary><strong>Create repeating placements</strong></summary>
+        <div class="controls-row-3" style="margin-top:8px">
+          <div>
+            <label><small class="muted">Task</small></label><br>
+            <select id="repeatTask"></select>
+          </div>
+          <div>
+            <label><small class="muted">Rule</small></label><br>
+            <select id="repeatRule">
+              <option>Every weekday (Mon–Fri)</option>
+              <option>Every Monday</option>
+              <option>Every Tuesday</option>
+              <option>Every Wednesday</option>
+              <option>Every Thursday</option>
+              <option>Every Friday</option>
+              <option>1st Monday</option><option>2nd Monday</option><option>3rd Monday</option><option>4th Monday</option><option>Last Monday</option>
+              <option>1st Tuesday</option><option>2nd Tuesday</option><option>3rd Tuesday</option><option>4th Tuesday</option><option>Last Tuesday</option>
+              <option>1st Wednesday</option><option>2nd Wednesday</option><option>3rd Wednesday</option><option>4th Wednesday</option><option>Last Wednesday</option>
+              <option>1st Thursday</option><option>2nd Thursday</option><option>3rd Thursday</option><option>4th Thursday</option><option>Last Thursday</option>
+              <option>1st Friday</option><option>2nd Friday</option><option>3rd Friday</option><option>4th Friday</option><option>Last Friday</option>
+            </select>
+          </div>
+          <div>
+            <label><small class="muted">Slot</small></label><br>
+            <select id="repeatSlot"><option>AM</option><option>PM</option></select>
+          </div>
+        </div>
+        <button id="btnApplyRepeat" class="primary" style="margin-top:8px">Apply to current month</button>
+      </details>
+
+      <div id="paletteList"></div>
+    </div>
+
+    <div>
+      <div id="monthView" class="calendar"></div>
+      <div id="tableView" class="tablewrap" style="display:none">
+        <table>
+          <thead><tr><th>Date</th><th>Slot</th><th>Title</th><th>BG</th><th>Font</th></tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Paste Seed Modal -->
+<div id="seedModal" class="modal">
+  <div class="inner">
+    <h3>Paste seed CSV</h3>
+    <p style="margin-top:0"><small class="muted">
+      Columns required: <b>year,month,date,slot,title,bg,font</b> — OR use <b>day</b> instead of <b>date</b>.
+      Example rows:<br>
+      2025,8,2025-08-01,AM,QUAD RUN,#b1a0c7,#000000<br>
+      2025,8,1,PM,BF3 RUN,#b7dee8,#000000
+    </small></p>
+    <textarea id="seedText" placeholder="Paste CSV here…"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="seedCancel">Cancel</button>
+      <button id="seedApply" class="primary">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== APP LOGIC ========== -->
+<script>
+const $ = sel => document.querySelector(sel);
+const el = (t,props={}) => Object.assign(document.createElement(t),props);
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const WEEKDAYS = ["Mon","Tue","Wed","Thu","Fri"];
+
+// ---------- State ----------
+let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
+  palette: [
+    {title:"3 ROLL RUN", bg:"#b1a0c7", font:"#000000"},
+    {title:"APEX 1 RUN", bg:"#b7dee8", font:"#000000"},
+    {title:"APEX 2 S/S/C", bg:"#b7dee8", font:"#000000"},
+    {title:"APEX 3 S/S/C", bg:"#b7dee8", font:"#000000"},
+    {title:"BC REWORK S/S/C", bg:"#b7dee8", font:"#ff0000"},
+    {title:"BF3 RUN", bg:"#b7dee8", font:"#000000"},
+    {title:"Gas Cementers", bg:"#ff0000", font:"#ffffff"},
+    {title:"QUAD RUN", bg:"#b1a0c7", font:"#000000"},
+    {title:"PGI C", bg:"#b1a0c7", font:"#000000"},
+    {title:"WSW PULLDOWN S/S/C", bg:"#b1a0c7", font:"#000000"}
+  ],
+  months: {}, // key "YYYY-MM" : { "YYYY-MM-DD": {AM:[], PM:[], EXTRA:[], holidayLabel?} }
+  year: 2025, month: 9 // October default (0-based later)
+};
+
+// ---------- Helpers ----------
+function pad(n){ return String(n).padStart(2,"0"); }
+function keyFor(y,m){ return `${y}-${pad(m)}`; }
+function dstr(y,m,day){ return `${y}-${pad(m)}-${pad(day)}`; }
+function isWeekend(d){ const w=d.getDay(); return w===0 || w===6; } // Sun/Sat
+function prevBusiness(d){
+  let x=new Date(d); x.setDate(x.getDate()-1);
+  while(isWeekend(x)) x.setDate(x.getDate()-1);
+  return x;
+}
+function ensureMonth(state,y,m){
+  const k = keyFor(y,m);
+  if(!state.months[k]) state.months[k] = {};
+  return k;
+}
+function msg(t){ const n=$("#msg"); n.textContent=t; n.style.display="block"; setTimeout(()=>n.style.display="none",3000); }
+function save(){ localStorage.setItem("outagePlanner_v34", JSON.stringify(state)); }
+
+// ---------- Holidays ----------
+function easter(year){
+  const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4);
+  const e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
+  const m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31);
+  const day=((h+l-7*m+114)%31)+1;
+  return new Date(year, month-1, day);
+}
+function nthWeekday(year,month,weekday,n){
+  const d=new Date(year,month-1,1); let count=0;
+  while(d.getMonth()===month-1){ if(d.getDay()===weekday){ count++; if(count===n) return new Date(d); } d.setDate(d.getDate()+1); }
+  return null;
+}
+function lastWeekday(year,month,weekday){
+  const d=new Date(year,month,0); // last day of month
+  while(d.getDay()!==weekday) d.setDate(d.getDate()-1);
+  return d;
+}
+function holidayMap(year){
+  const H={}; const add=(dt, label, observe=true)=>{
+    const k=dstr(dt.getFullYear(), dt.getMonth()+1, dt.getDate()); H[k]=label;
+    if(observe){
+      const wd=dt.getDay();
+      if(wd===6){ const o=new Date(dt); o.setDate(o.getDate()-1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
+      if(wd===0){ const o=new Date(dt); o.setDate(o.getDate()+1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
+    }
+  };
+  add(new Date(year,0,1),"New Year’s Day");
+  H[dstr(year,0+1, nthWeekday(year,1,1,3).getDate())] = "MLK Day";               // 3rd Mon Jan (no observed)
+  H[dstr(year,1+1, nthWeekday(year,2,1,3).getDate())] = "Presidents Day";       // 3rd Mon Feb
+  H[dstr(year,4+1, lastWeekday(year,5,1).getDate())]  = "Memorial Day";         // last Mon May
+  add(new Date(year,5,19),"Juneteenth");
+  add(new Date(year,6,4),"Independence Day");
+  H[dstr(year,8, nthWeekday(year,9,1,1).getDate())]   = "Labor Day";            // 1st Mon Sep
+  H[dstr(year,9, nthWeekday(year,10,1,2).getDate())]  = "Columbus Day";         // 2nd Mon Oct
+  add(new Date(year,10,11),"Veterans Day");
+  const thx = nthWeekday(year,11,4,4); H[dstr(thx.getFullYear(),12,thx.getDate())]="Thanksgiving";
+  const bf = new Date(thx); bf.setDate(bf.getDate()+1); H[dstr(bf.getFullYear(),12,bf.getDate())]="Black Friday";
+  H[dstr(year,11,24)]="Christmas Eve"; add(new Date(year,11,25),"Christmas Day"); H[dstr(year,11,31)]="New Year’s Eve";
+  const eas = easter(year); H[dstr(eas.getFullYear(), eas.getMonth()+1, eas.getDate())] = "Easter";
+  const gf = new Date(eas); gf.setDate(gf.getDate()-2); H[dstr(gf.getFullYear(), gf.getMonth()+1, gf.getDate())] = "Good Friday";
+  return H;
+}
+const holidayCache = {};
+function getHolidays(y){ if(!holidayCache[y]) holidayCache[y]=holidayMap(y); return holidayCache[y]; }
+
+// ---------- Rendering ----------
+function renderMonth(){
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value); // numeric month 1..12
+  const H = getHolidays(y);
+  const start = new Date(y, m-1, 1);
+  const end   = new Date(y, m, 0);
+
+  const k = ensureMonth(state,y,m);
+  const container = $("#monthView"); container.innerHTML = "";
+
+  // headings
+  const head = el("div",{className:"weekdays"});
+  WEEKDAYS.forEach(w => head.append(el("div",{textContent:w, className:"badge"})));
+  container.append(head);
+
+  const grid = el("div",{className:"weekgrid"});
+  for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+    const wd = d.getDay(); // Sun=0..Sat=6
+    if(wd===0 || wd===6) continue; // skip weekends
+    const ds = dstr(y,m,d.getDate());
+    const day = el("div",{className:"day"});
+    const dateEl = el("div",{className:"date",textContent: d.toLocaleDateString(undefined,{month:"short",day:"numeric"})});
+    day.append(dateEl);
+
+    // holiday label
+    const hol = H[ds];
+    if(hol){ day.append(el("div",{className:"holabel",textContent:hol})); }
+
+    const mkSlot = (slotName)=>{
+      const slot = el("div",{className:"slot"});
+      slot.append(el("div",{className:"slot-title",textContent:slotName}));
+      const dz = el("div",{className:"dropzone"});
+      dz.dataset.ds = ds; dz.dataset.slot = slotName.replace(":","").trim();
+      dz.addEventListener("dragover", e=>e.preventDefault());
+      dz.addEventListener("drop", onDropFromPalette);
+      slot.append(dz);
+
+      // existing entries
+      const rec = state.months[k][ds] || {AM:[],PM:[],EXTRA:[]};
+      const arr = slotName.startsWith("AM") ? rec.AM : rec.PM;
+      arr.forEach(item => dz.append(renderEntry(ds, slotName.startsWith("AM")?"AM":"PM", item)));
+      return slot;
+    };
+    day.append(mkSlot("AM"), mkSlot("PM"));
+    grid.append(day);
+  }
+  container.append(grid);
+
+  // tab active
+  $("#tabMonth").classList.add("active"); $("#tabTable").classList.remove("active");
+  $("#monthView").style.display="block"; $("#tableView").style.display="none";
+}
+
+function renderEntry(ds,slot,item){
+  const div = el("div",{className:"entry"});
+  div.style.background = item.bg || "#ffffff";
+  div.style.color = (item.font || "#000000");
+  div.draggable = true;
+  div.addEventListener("dragstart", e=>{
+    e.dataTransfer.setData("text/plain", JSON.stringify({type:"move", ds, slot, item}));
+  });
+  const label = el("span",{textContent:item.title});
+  const x = el("span",{className:"x",textContent:"✕"});
+  x.addEventListener("click", ()=>removeEntry(ds,slot,item));
+  div.append(label,x);
+  return div;
+}
+
+function renderTable(){
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const k = ensureMonth(state,y,m), body = $("#tableBody"); body.innerHTML="";
+  const days = Object.keys(state.months[k]).sort();
+  for(const ds of days){
+    const rec = state.months[k][ds]; if(!rec) continue;
+    [["AM",rec.AM],["PM",rec.PM]].forEach(([slot,arr])=>{
+      if(arr.length===0) return;
+      arr.forEach(it=>{
+        const tr = el("tr");
+        tr.append(el("td",{textContent: ds}), el("td",{textContent:slot}),
+                 el("td",{textContent:it.title}), el("td",{textContent:it.bg}), el("td",{textContent:it.font}));
+        body.append(tr);
+      });
+    });
+  }
+}
+
+// ---------- Palette ----------
+function refreshPalette(){
+  const list = $("#paletteList"); list.innerHTML="";
+  state.palette.forEach((p,i)=>{
+    const chip = el("div",{className:"taskchip",draggable:true});
+    const cb = el("div",{className:"colorbox"}); cb.style.background = p.bg || "#fff";
+    const name = el("div",{textContent:p.title});
+    chip.append(cb, name, el("span",{className:"badge",textContent:p.font||"#000000"}));
+    chip.addEventListener("dragstart", e=>{
+      e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
+    });
+    list.append(chip);
+  });
+
+  // fill repeat combobox
+  const sel=$("#repeatTask"); sel.innerHTML="";
+  state.palette.forEach(p => sel.append(el("option",{textContent:p.title})));
+}
+
+function onDropFromPalette(e){
+  e.preventDefault();
+  const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+  const ds = e.currentTarget.dataset.ds;
+  const slot = e.currentTarget.dataset.slot; // "AM" or "PM"
+
+  if(data.type==="palette"){
+    const item = {title:data.title, bg:data.bg||"#ffffff", font:(data.font||"#000000")};
+    placeItem(ds, slot, item, true);
+  }else if(data.type==="move"){
+    // moving an existing card
+    removeEntry(data.ds, data.slot, data.item, false);
+    placeItem(ds, slot, data.item, true);
+  }
+}
+
+function removeEntry(ds,slot,item, saveAfter=true){
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const k = ensureMonth(state,y,m);
+  const arr = state.months[k][ds]?.[slot] || [];
+  const idx = arr.findIndex(x => x.title===item.title && x.bg===item.bg && x.font===item.font);
+  if(idx>-1){ arr.splice(idx,1); if(saveAfter){ save(); renderMonth(); renderTable(); } }
+}
+
+function placeItem(ds,slot,item, shiftForHoliday){
+  // holiday shift → previous business day
+  const [y,m,d] = ds.split("-").map(n=>Number(n));
+  const H = getHolidays(y);
+  let dateObj = new Date(y, m-1, d);
+  if(shiftForHoliday && H[ds]){
+    let p = prevBusiness(dateObj);
+    while(getHolidays(p.getFullYear())[dstr(p.getFullYear(),p.getMonth()+1,p.getDate())]) p = prevBusiness(p);
+    dateObj = p;
+  }
+  const nds = dstr(dateObj.getFullYear(), dateObj.getMonth()+1, dateObj.getDate());
+  const k = ensureMonth(state, dateObj.getFullYear(), dateObj.getMonth()+1);
+  if(!state.months[k][nds]) state.months[k][nds] = {AM:[],PM:[],EXTRA:[]};
+  state.months[k][nds][slot].push(item);
+  save(); renderMonth(); renderTable();
+}
+
+// ---------- Export / Import ----------
+function exportCSV(){
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const k = ensureMonth(state,y,m);
+  let out = "year,month,date,slot,title,bg,font\n";
+  for(const ds of Object.keys(state.months[k]).sort()){
+    const rec = state.months[k][ds]; if(!rec) continue;
+    [["AM",rec.AM],["PM",rec.PM]].forEach(([slot,arr])=>{
+      if(arr.length===0){
+        out += `${y},${m},${ds},${slot},,,\n`;
+      }else{
+        arr.forEach(it=> out += `${y},${m},${ds},${slot},${csvEscape(it.title)},${it.bg||""},${it.font||""}\n`);
+      }
+    });
+  }
+  download("placements_"+y+"_"+pad(m)+".csv", out);
+}
+function csvEscape(s){ if(!s) return ""; if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"'; return s; }
+function download(name,text){
+  const a=el("a",{href:"data:text/plain;charset=utf-8,"+encodeURIComponent(text),download:name}); document.body.append(a); a.click(); a.remove();
+}
+
+function exportMonthHTML(){
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const w = window.open("","_blank");
+  const title = `${MONTHS[m-1]} ${y} — Outage Planner`;
+  const cont = $("#monthView").innerHTML;
+  w.document.write(`<!doctype html><meta charset="utf-8"><title>${title}</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111;margin:16px}
+    .weekdays,.weekgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+    .badge{padding:2px 6px;border:1px solid #ccc;border-radius:999px;font-size:12px;text-align:center}
+    .day{border:1px solid #ccc;border-radius:10px;min-height:120px;padding:8px;background:#fff}
+    .date{position:absolute;top:6px;right:8px;font-size:12px;color:#555}
+    .slot{border:1px dashed #ddd;border-radius:8px;padding:6px;min-height:38px;margin-top:8px;background:#fafafa}
+    .entry{margin-top:4px;padding:4px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;font-weight:600}
+    .x{display:none}
+  </style>
+  <h2>${title}</h2><div>${cont}</div>`);
+  w.document.close();
+}
+
+function importCSVText(text){ applyCSV(text); }
+function importCSVFile(file){
+  const r = new FileReader();
+  r.onload = () => applyCSV(r.result);
+  r.readAsText(file);
+}
+
+// Accepts date (YYYY-MM-DD) OR day (1..31)
+function applyCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  if(!lines.length) { msg("Empty CSV"); return; }
+  const head = lines.shift().split(",").map(s=>s.trim().replace(/^"|"$/g,""));
+  const idx = {
+    year: head.indexOf("year"),
+    month: head.indexOf("month"),
+    date: head.indexOf("date"),
+    day:  head.indexOf("day"),
+    slot: head.indexOf("slot"),
+    title:head.indexOf("title"),
+    bg:   head.indexOf("bg"),
+    font: head.indexOf("font")
+  };
+  if(idx.year<0||idx.month<0||(idx.date<0&&idx.day<0)||idx.slot<0||idx.title<0){
+    msg("CSV needs columns: year, month, (date OR day), slot, title [, bg, font]"); return;
+  }
+
+  // clear current month store (we'll refill any months we touch)
+  state.months = state.months || {};
+
+  for(const ln of lines){
+    if(!ln.trim()) continue;
+    const cells = ln.match(/"((?:[^"]|"")*)"|[^,]+/g).map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"'));
+    const y = Number(cells[idx.year]), m = Number(cells[idx.month]);
+    const slot = (cells[idx.slot]||"AM").toUpperCase();
+    const title = (cells[idx.title]||"").trim();
+    if(!title){ continue; }
+
+    // build date string
+    let ds = "";
+    if(idx.date>-1){
+      const raw = cells[idx.date].trim();
+      if(/^\d{4}-\d{1,2}-\d{1,2}$/.test(raw)) ds = raw;
+      else if(/^\d{1,2}$/.test(raw)) ds = dstr(y,m,Number(raw));
+      else continue;
+    }else{
+      const day = Number(cells[idx.day]); ds = dstr(y,m,day);
+    }
+
+    let bg = (cells[idx.bg]||"").trim();
+    let font = (cells[idx.font]||"").trim().toLowerCase();
+    if(!bg) bg = "#ffffff";
+    if(!font) font = "#000000";
+
+    // ensure store and push
+    const k = ensureMonth(state,y,m);
+    if(!state.months[k][ds]) state.months[k][ds] = {AM:[],PM:[],EXTRA:[]};
+
+    if(slot==="AM"||slot==="PM") state.months[k][ds][slot].push({title,bg,font});
+    else state.months[k][ds].EXTRA.push({title,bg,font});
+  }
+
+  save(); renderMonth(); renderTable(); msg("Seeded from pasted CSV.");
+}
+
+// ---------- Repeat tools ----------
+function copyMonthToAllMonths(){
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const k = ensureMonth(state,y,m);
+  const src = JSON.parse(JSON.stringify(state.months[k]||{}));
+  for(let mm=1; mm<=12; mm++){
+    if(mm===m) continue;
+    const k2 = ensureMonth(state,y,mm);
+    // clear weekdays then copy placement dates matching weekday positions
+    state.months[k2] = JSON.parse(JSON.stringify(src));
+  }
+  save(); msg("Copied to all months of "+y); renderMonth(); renderTable();
+}
+
+function copyYearToRange(fromYear, startYear, endYear){
+  for(let y=startYear; y<=endYear; y++){
+    if(y===fromYear) continue;
+    for(let m=1; m<=12; m++){
+      const kFrom = ensureMonth(state, fromYear, m);
+      const kTo   = ensureMonth(state, y, m);
+      state.months[kTo] = JSON.parse(JSON.stringify(state.months[kFrom]||{}));
+    }
+  }
+  save(); msg(`Copied ${fromYear} → ${startYear}-${endYear}`); renderMonth(); renderTable();
+}
+
+// ---------- UI wiring / boot ----------
+function buildSelectors(){
+  const ys = $("#yearSel"), ms=$("#monthSel");
+  ys.innerHTML=""; ms.innerHTML="";
+  for(let y=2024; y<=2032; y++) ys.append(el("option",{value:y,textContent:y}));
+  for(let m=1; m<=12; m++) ms.append(el("option",{value:m,textContent:MONTHS[m-1]}));
+  ys.value = state.year || new Date().getFullYear();
+  ms.value = state.month || (new Date().getMonth()+1);
+  ys.addEventListener("change", ()=>{ state.year=Number(ys.value); save(); renderMonth(); renderTable(); });
+  ms.addEventListener("change", ()=>{ state.month=Number(ms.value); save(); renderMonth(); renderTable(); });
+}
+
+function bindButtons(){
+  $("#tabMonth").addEventListener("click",()=>{ $("#tabMonth").classList.add("active"); $("#tabTable").classList.remove("active"); $("#monthView").style.display="block"; $("#tableView").style.display="none"; });
+  $("#tabTable").addEventListener("click",()=>{ $("#tabTable").classList.add("active"); $("#tabMonth").classList.remove("active"); $("#tableView").style.display="block"; $("#monthView").style.display="none"; });
+
+  $("#btnCopyMonth").addEventListener("click", copyMonthToAllMonths);
+  $("#btnExportHtml").addEventListener("click", exportMonthHTML);
+  $("#btnExportCSV").addEventListener("click", exportCSV);
+  $("#btnImportCSV").addEventListener("click", ()=>$("#fileImport").click());
+  $("#fileImport").addEventListener("change", e=>{ if(e.target.files?.[0]) importCSVFile(e.target.files[0]); });
+  $("#btnReset").addEventListener("click", ()=>{
+    const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+    state.months[keyFor(y,m)] = {}; save(); renderMonth(); renderTable();
+  });
+
+  // Seed modal
+  const modal=$("#seedModal"), openSeed=()=>modal.style.display="flex", closeSeed=()=>modal.style.display="none";
+  $("#btnSeedCSV").addEventListener("click", openSeed);
+  $("#seedCancel").addEventListener("click", closeSeed);
+  $("#seedApply").addEventListener("click", ()=>{
+    const text=$("#seedText").value.trim(); if(!text){ closeSeed(); return; }
+    applyCSV(text); closeSeed(); msg("Seeded from pasted CSV.");
+  });
+
+  // Copy year → range
+  $("#btnCopyYearRange").addEventListener("click", ()=>{
+    const y = Number($("#yearSel").value);
+    const ans = prompt(`Copy the entire ${y} schedule to which year range? (e.g. 2026-2030)`,"2026-2030");
+    if(!ans) return;
+    const m = ans.match(/^(\d{4})\s*-\s*(\d{4})$/);
+    if(!m){ msg("Use format YYYY-YYYY"); return; }
+    const startY=Number(m[1]), endY=Number(m[2]);
+    if(startY>endY){ msg("Start year must be ≤ end year"); return; }
+    copyYearToRange(y,startY,endY);
+  });
+}
+
+function boot(){
+  buildSelectors();
+  refreshPalette();
+  bindButtons();
+  renderMonth();
+  renderTable();
+}
+document.addEventListener("DOMContentLoaded", boot);
+</script>
+</body>
+</html>
