@@ -367,114 +367,117 @@ let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
    BC REWORK S/S/C,#b7dee8,#ff0000
    Gas Cementers,#ff0000,#ffffff
    ...
-const PASTED_TASK_CSV = `
-title,bg,font
-PGI C,#B1A0C7,#FF0000
-BC REWORK S/S/C,#B7DEE4,#FF0000
-VMI 1 C,#B7DEE4,#FF0000
-3 ROLL C,#B1A0C3,#FF0000
-TL2 RUN,#B1A0C3,#000000
-APEX 1 RUN,#B7DEE4,#000000
-FISCHER 1 S/S/C,#B7DEE4,#FF0000
-VMI 2 C,#B7DEE4,#FF0000
-GUM C,#B1A0C3,#FF0000
-TL5 RUN,#B1A0C3,#000000
-APEX 2 RUN,#B7DEE4,#000000
-WSW S/S/C,#B1A0C3,#FF0000
-FISCHER 2 S/S/C,#B7DEE4,#FF0000
-VMI 3 C,#B7DEE4,#FF0000
-JOHNSTONE C,#B1A0C3,#FF0000
-RECOUP RUN,#B1A0C3,#000000
-APEX 3 RUN,#B7DEE4,#000000
-QUAD S/S/C,#B1A0C3,#FF0000
-VMI REWORK C,#B7DEE4,#FF0000
-WSW PULLDOWN C,#B1A0C3,#FF0000
-PGI RUN,#B1A0C3,#000000
-APEX 4 RUN,#B7DEE4,#000000
-QUINT S/S/C,#B1A0C3,#FF0000
-BC 3 C,#B7DEE4,#FF0000
-TL2 S/S/C,#B1A0C3,#FF0000
-3 ROLL RUN,#FF0000,#000000
-APEX 5 RUN,#B7DEE4,#000000
-GUM RUN,#B1A0C3,#000000
-APEX 6 RUN,#B7DEE4,#000000
-BC 8 C,#B7DEE4,#FF0000
-BF2 S/S/C,#B7DEE4,#FF0000
-TL5 S/S/C,#B1A0C3,#FF0000
-WSW C,#B1A0C3,#FF0000
-JOHNSTONE RUN,#B1A0C3,#000000
-FF 5/6 RUN,#B7DEE4,#000000
-BC 9 C,#B7DEE4,#FF0000
-BF3 S/S/C,#B7DEE4,#FF0000
-RECOUP S/S/C,#B1A0C3,#FF0000
-QUAD C,#B1A0C3,#FF0000
-FF 7/9 RUN,#B7DEE4,#000000
-BC 10 C,#B7DEE4,#FF0000
-BF6 S/S/C,#B7DEE4,#FF0000
-PGI S/S/C,#B1A0C3,#FF0000
-QUINT C,#B1A0C3,#FF0000
-VMI 1 RUN,#B7DEE4,#000000
-APEX 1 S/S/C,#B7DEE4,#FF0000
-TL2 C,#B1A0C3,#FF0000
-TL3 C,#B1A0C3,#FF0000
-WSW RUN,#B1A0C3,#000000
-VMI 2 RUN,#B7DEE4,#000000
-FISCHER 1 C,#B7DEE4,#FF0000
-APEX 2 S/S/C,#B7DEE4,#FF0000
-GUM S/S/C,#B1A0C3,#FF0000
-TL5 C,#B1A0C3,#FF0000
-QUAD RUN,#B1A0C3,#000000
-VMI 3 RUN,#B7DEE4,#000000
-FISCHER 2 C,#B7DEE4,#FF0000
-APEX 3 S/S/C,#B7DEE4,#FF0000
-JOHNSTONE S/S/C,#B1A0C3,#FF0000
-RECOUP C,#B1A0C3,#FF0000
-QUINT RUN,#B1A0C3,#000000
-VMI REWORK RUN,#B7DEE4,#000000
-APEX 4 S/S/C,#B7DEE4,#FF0000
-WSW PULLDOWN S/S/C,#B1A0C3,#FF0000
-TL2 RUN,#B1A0C3,#000000
-PGI C,#B1A0C3,#FF0000
-TL2 RUN,#B1A0C3,#000000
-BC 3 RUN,#B7DEE4,#000000
-APEX 5 S/S/C,#B7DEE4,#FF0000
-3 ROLL C,#FF0000,#000000
-BF2 C,#B7DEE4,#FF0000
-GUM C,#B1A0C3,#FF0000
-APEX 6 S/S/C,#B7DEE4,#FF0000
-TL5 RUN,#B1A0C3,#000000
-BC8 RUN,#B7DEE4,#000000
-WSW S/C,#B1A0C3,#FF0000
-RECOUP RUN,#B1A0C3,#000000
-BC 9 RUN,#B7DEE4,#000000
-FF 5/6 S/S/C,#B7DEE4,#FF0000
-BF3 C,#B7DEE4,#FF0000
-JOHNSTONE C,#B1A0C3,#FF0000
-QUAD S/C,#B1A0C3,#FF0000
-PGI RUN,#B1A0C3,#000000
-BC 10 RUN,#B7DEE4,#000000
-FF 7/9 S/S/C,#B7DEE4,#FF0000
-BF6 C,#B7DEE4,#FF0000
-WSW PULLDOWN C,#B1A0C3,#FF0000
-QUINT S/C,#B1A0C3,#FF0000
-3 ROLL RUN,#FF0000,#000000
-BC REWORK RUN,#B7DEE4,#000000
-TL2 S/S/C,#B1A0C3,#FF0000
-VMI 1 S/S/C,#B7DEE4,#FF0000
-APEX 1 C,#B7DEE4,#FF0000
-TL5 S/S/C,#B1A0C3,#FF0000
-VMI 2 S/S/C,#B7DEE4,#FF0000
-VMI 2 S/S/C,#B7DEE4,#FF0000
-GUM RUN,#B1A0C3,#000000
-FISCHER 1 RUN,#B7DEE4,#000000
-WSW C,#B1A0C3,#FF0000
-VMI 3 S/S/C,#B7DEE4,#FF0000
-APEX 3 C,#B7DEE4,#FF0000
-RECOUP S/C,#B1A0C3,#FF0000
-JOHNSTONE RUN,#B1A0C3,#000000
-FISCHER 2 RUN,#B7DEE4,#000000
-QUAD C,#B1A0C3,#FF0000
-`;
+
+// ---------- State ----------
+let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
+  palette: [
+    {title:"PGI C", bg:"#B1A0C7", font:"#FF0000"},
+    {title:"BC REWORK S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 1 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"3 ROLL C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 1 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FISCHER 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 2 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 2 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"WSW S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"FISCHER 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"JOHNSTONE C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"RECOUP RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 3 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"QUAD S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI REWORK C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"PGI RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 4 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"QUINT S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    /* (Skipped CSV line 25: blank title) */
+    {title:"BC 3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL2 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"3 ROLL RUN", bg:"#FF0000", font:"#000000"},
+    {title:"APEX 5 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"GUM RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 6 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"BC 8 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL5 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"WSW C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"JOHNSTONE RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"FF 5/6 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"BC 9 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"RECOUP S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"FF 7/9 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"BC 10 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"PGI S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUINT C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI 1 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"APEX 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL2 C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL3 C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"WSW RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"VMI 2 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FISCHER 1 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL5 C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUAD RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"VMI 3 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FISCHER 2 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"JOHNSTONE S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"RECOUP C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUINT RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"VMI REWORK RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"APEX 4 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"WSW PULLDOWN S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"PGI C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BC 3 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"APEX 5 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"3 ROLL C", bg:"#FF0000", font:"#000000"},
+    {title:"BF2 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"APEX 6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BC8 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"WSW S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"RECOUP RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BC 9 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FF 5/6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"JOHNSTONE C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUAD S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"PGI RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BC 10 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FF 7/9 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF6 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUINT S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"3 ROLL RUN", bg:"#FF0000", font:"#000000"},
+    {title:"BC REWORK RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"TL2 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 1 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL5 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"FISCHER 1 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"WSW C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"RECOUP S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"JOHNSTONE RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"FISCHER 2 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"}
+  ],
 
   let start = 0;
   // if header is present, detect & skip
