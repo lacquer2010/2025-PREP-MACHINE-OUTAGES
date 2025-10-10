@@ -1,4 +1,4 @@
-<!-- Outage Planner v3.5a — hard-coded palette support (LIGHT THEME) -->
+<!-- Outage Planner v3.5 — saved 2025-10-10 (LIGHT THEME) OPEN IN A WEB BROWSER -->
 
 <!doctype html>
 <html>
@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Outage Planner</title>
 
+<!-- ========== LIGHT THEME CSS (unchanged palette) ========== -->
 <style>
 :root{
   --bg:#f4f6fb; --card:#ffffff; --ring:#d6d9e0; --text:#0b0f14;
@@ -96,6 +97,7 @@ summary{cursor:pointer}
         </div>
       </div>
 
+      <!-- Top bar tabs -->
       <div class="viewtabs" role="tablist" aria-label="View tabs">
         <button id="tabMonth" class="active">Month View</button>
         <button id="tabWeek">Week View</button>
@@ -111,6 +113,7 @@ summary{cursor:pointer}
       </small></div>
     </div>
 
+    <!-- Right column — Tools (simple wording) -->
     <div class="card rightcol">
       <div class="sectionlabel">Tools</div>
       <div class="tools">
@@ -174,6 +177,7 @@ summary{cursor:pointer}
   </div>
 
   <div class="grid">
+    <!-- Left column — Task palette -->
     <div class="palette">
       <header>
         <div class="sectionlabel">Task palette</div>
@@ -183,6 +187,7 @@ summary{cursor:pointer}
         </div>
       </header>
 
+      <!-- Repeat tool (your wording adapted) -->
       <details style="margin-bottom:8px">
         <summary><strong>Repeat</strong></summary>
         <div class="controls-row-4" style="margin-top:8px">
@@ -216,11 +221,15 @@ summary{cursor:pointer}
           </div>
         </div>
         <button id="btnApplyRepeat" class="primary" style="margin-top:8px">Apply</button>
+        <div id="paletteTagsHint" class="banner info" style="display:none;margin-top:8px">
+          <small class="muted">Editing tasks: try quick filter tags like <b>Blue=PM</b>, <b>Purple=Run</b>.</small>
+        </div>
       </details>
 
       <div id="paletteList"></div>
     </div>
 
+    <!-- Right side — views -->
     <div>
       <div id="monthView" class="calendar" aria-label="Month view"></div>
 
@@ -290,193 +299,177 @@ summary{cursor:pointer}
   </div>
 </div>
 
+<!-- ========== APP LOGIC ========== -->
 <script>
-// ===== tiny DOM helpers =====
 const $ = sel => document.querySelector(sel);
 const el = (t,props={}) => Object.assign(document.createElement(t),props);
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const WEEKDAYS = ["Mon","Tue","Wed","Thu","Fri"];
 
-// ===== HARD-CODED TASKS: paste your CSV between the backticks =====
-const FORCE_CODE_PALETTE = true; // set false to stop overriding localStorage
-const TASKS_CSV = `title,bg,font
-PASTE_YOUR_CSV_HERE
-`;
-// Examples (delete these when you paste):
-// title,bg,font
-// 3 ROLL RUN,#b1a0c7,#000000
-// APEX 1 RUN,#b7dee8,#000000
-// BC REWORK S/S/C,#b7dee8,#ff0000
-// Gas Cementers,#ff0000,#ffffff
-
-// Parse a simple "title,bg,font" CSV (header optional).
-function parsePaletteCSV(text){
-  const lines = text.trim().split(/\r?\n/).filter(Boolean);
-  if(!lines.length) return [];
-  // detect header
-  let startIdx = 0;
-  let header = lines[0].toLowerCase();
-  let hasHeader = /(title|bg|font)/.test(header);
-  const rows = hasHeader ? lines.slice(1) : lines;
-  return rows.map(ln=>{
-    const cells = ln.match(/"((?:[^"]|"")*)"|[^,]+/g)?.map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"')) || [];
-    const [title,bg,font] = cells;
-    if(!title) return null;
-    return { title: title.trim(), bg: (bg||"#ffffff").trim(), font: (font||"#000000").trim() };
-  }).filter(Boolean);
-}
-
 // ---------- State ----------
 let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
   palette: [
-    palette: [
-  {title:"PGI C", bg:"#B1A0C7", font:"#FF0000"},
-  {title:"BC REWORK S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"VMI 1 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"3 ROLL C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"APEX 1 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"FISCHER 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"VMI 2 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"GUM C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"APEX 2 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"WSW S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"FISCHER 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"VMI 3 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"JOHNSTONE C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"RECOUP RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"APEX 3 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"QUAD S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"VMI REWORK C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"PGI RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"APEX 4 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"QUINT S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  /* (Skipped CSV line 25: blank title) */
-  {title:"BC 3 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"TL2 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"3 ROLL RUN", bg:"#FF0000", font:"#000000"},
-  {title:"APEX 5 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"GUM RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"APEX 6 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"BC 8 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"BF2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"TL5 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"WSW C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"JOHNSTONE RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"FF 5/6 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"BC 9 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"BF3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"RECOUP S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"FF 7/9 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"BC 10 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"BF6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"PGI S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"QUINT C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"VMI 1 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"APEX 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"TL2 C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"TL3 C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"WSW RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"VMI 2 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"FISCHER 1 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"APEX 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"GUM S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"TL5 C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"QUAD RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"VMI 3 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"FISCHER 2 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"APEX 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"JOHNSTONE S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"RECOUP C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"QUINT RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"VMI REWORK RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"APEX 4 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"WSW PULLDOWN S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"PGI C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"BC 3 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"APEX 5 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"3 ROLL C", bg:"#FF0000", font:"#000000"},
-  {title:"BF2 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"GUM C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"APEX 6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"BC8 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"WSW S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"RECOUP RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"BC 9 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"FF 5/6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"BF3 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"JOHNSTONE C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"QUAD S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"PGI RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"BC 10 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"FF 7/9 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"BF6 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"QUINT S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"3 ROLL RUN", bg:"#FF0000", font:"#000000"},
-  {title:"BC REWORK RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"TL2 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"VMI 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"APEX 1 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"TL5 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"GUM RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"FISCHER 1 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"WSW C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"VMI 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"APEX 3 C", bg:"#B7DEE4", font:"#FF0004"},
-  {title:"RECOUP S/C", bg:"#B1A0C3", font:"#FF0004"},
-  {title:"JOHNSTONE RUN", bg:"#B1A0C3", font:"#000000"},
-  {title:"FISCHER 2 RUN", bg:"#B7DEE4", font:"#000000"},
-  {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"}
-],
-
+    {title:"PGI C", bg:"#B1A0C7", font:"#FF0000"},
+    {title:"BC REWORK S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 1 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"3 ROLL C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 1 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FISCHER 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 2 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 2 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"WSW S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"FISCHER 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"JOHNSTONE C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"RECOUP RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 3 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"QUAD S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI REWORK C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"PGI RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 4 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"QUINT S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    /* (Skipped CSV line 25: blank title) */
+    {title:"BC 3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL2 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"3 ROLL RUN", bg:"#FF0000", font:"#000000"},
+    {title:"APEX 5 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"GUM RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"APEX 6 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"BC 8 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL5 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"WSW C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"JOHNSTONE RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"FF 5/6 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"BC 9 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"RECOUP S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"FF 7/9 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"BC 10 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"PGI S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUINT C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI 1 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"APEX 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL2 C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL3 C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"WSW RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"VMI 2 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FISCHER 1 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL5 C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUAD RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"VMI 3 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FISCHER 2 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"JOHNSTONE S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"RECOUP C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUINT RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"VMI REWORK RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"APEX 4 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"WSW PULLDOWN S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"PGI C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BC 3 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"APEX 5 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"3 ROLL C", bg:"#FF0000", font:"#000000"},
+    {title:"BF2 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"APEX 6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BC8 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"WSW S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"RECOUP RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BC 9 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FF 5/6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"JOHNSTONE C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUAD S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"PGI RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BC 10 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"FF 7/9 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"BF6 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"QUINT S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"3 ROLL RUN", bg:"#FF0000", font:"#000000"},
+    {title:"BC REWORK RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"TL2 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 1 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL5 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"FISCHER 1 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"WSW C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"VMI 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"RECOUP S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"JOHNSTONE RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"FISCHER 2 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"}
   ],
-  months: {},
-  year: 2025, month: 10
+  months: {}, // key "YYYY-MM" : { "YYYY-MM-DD": {AM:[], PM:[], EXTRA:[], holidayLabel?} }
+  year: 2025, month: 10 // October as numeric (1..12)
 };
-
-// If you provided a CSV above, override the palette from code:
-(function maybeOverridePalette(){
-  if(!FORCE_CODE_PALETTE) return;
-  const parsed = parsePaletteCSV(TASKS_CSV);
-  if(parsed.length){
-    state.palette = parsed;
-    // keep existing months, just refresh palette; persist so everyone sees same list
-    localStorage.setItem("outagePlanner_v34", JSON.stringify(state));
-  }
-})();
 
 // ---------- Helpers ----------
 function pad(n){ return String(n).padStart(2,"0"); }
 function keyFor(y,m){ return `${y}-${pad(m)}`; }
 function dstr(y,m,day){ return `${y}-${pad(m)}-${pad(day)}`; }
-function isWeekend(d){ const w=d.getDay(); return w===0 || w===6; }
-function prevBusiness(d){ let x=new Date(d); x.setDate(x.getDate()-1); while(isWeekend(x)) x.setDate(x.getDate()-1); return x; }
-function ensureMonth(state,y,m){ const k = keyFor(y,m); if(!state.months[k]) state.months[k] = {}; return k; }
+function isWeekend(d){ const w=d.getDay(); return w===0 || w===6; } // Sun/Sat
+function prevBusiness(d){
+  let x=new Date(d); x.setDate(x.getDate()-1);
+  while(isWeekend(x)) x.setDate(x.getDate()-1);
+  return x;
+}
+function ensureMonth(state,y,m){
+  const k = keyFor(y,m);
+  if(!state.months[k]) state.months[k] = {};
+  return k;
+}
 function msg(t){ const n=$("#msg"); n.textContent=t; n.style.display="block"; setTimeout(()=>n.style.display="none",3000); }
 function save(){ localStorage.setItem("outagePlanner_v34", JSON.stringify(state)); }
 
 // ---------- Holidays ----------
-function easter(year){const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(year,mo-1,da);}
-function nthWeekday(year,month,weekday,n){const d=new Date(year,month-1,1);let c=0;while(d.getMonth()===month-1){if(d.getDay()===weekday){c++;if(c===n)return new Date(d);}d.setDate(d.getDate()+1);}return null;}
-function lastWeekday(year,month,weekday){const d=new Date(year,month,0);while(d.getDay()!==weekday)d.setDate(d.getDate()-1);return d;}
+function easter(year){
+  const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4);
+  const e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
+  const m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31);
+  const day=((h+l-7*m+114)%31)+1;
+  return new Date(year, month-1, day);
+}
+function nthWeekday(year,month,weekday,n){
+  const d=new Date(year,month-1,1); let count=0;
+  while(d.getMonth()===month-1){ if(d.getDay()===weekday){ count++; if(count===n) return new Date(d); } d.setDate(d.getDate()+1); }
+  return null;
+}
+function lastWeekday(year,month,weekday){
+  const d=new Date(year,month,0);
+  while(d.getDay()!==weekday) d.setDate(d.getDate()-1);
+  return d;
+}
 function holidayMap(year){
   const H={}; const add=(dt, label, observe=true)=>{
     const k=dstr(dt.getFullYear(), dt.getMonth()+1, dt.getDate()); H[k]=label;
-    if(observe){const wd=dt.getDay(); if(wd===6){const o=new Date(dt);o.setDate(o.getDate()-1);H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)";}
-                  if(wd===0){const o=new Date(dt);o.setDate(o.getDate()+1);H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)";}}
+    if(observe){
+      const wd=dt.getDay();
+      if(wd===6){ const o=new Date(dt); o.setDate(o.getDate()-1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
+      if(wd===0){ const o=new Date(dt); o.setDate(o.getDate()+1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
+    }
   };
   add(new Date(year,0,1),"New Year’s Day");
-  H[dstr(year,0, nthWeekday(year,1,1,3).getDate())] = "MLK Day";
   H[dstr(year,1, nthWeekday(year,2,1,3).getDate())] = "Presidents Day";
+  H[dstr(year,0, nthWeekday(year,1,1,3).getDate())] = "MLK Day";
   H[dstr(year,4, lastWeekday(year,5,1).getDate())]  = "Memorial Day";
   add(new Date(year,5,19),"Juneteenth");
   add(new Date(year,6,4),"Independence Day");
@@ -492,12 +485,13 @@ function holidayMap(year){
 const holidayCache = {};
 function getHolidays(y){ if(!holidayCache[y]) holidayCache[y]=holidayMap(y); return holidayCache[y]; }
 
-// ---------- Rendering (Month/Week/Year/Table) ----------
+// ---------- Rendering (Month / Week / Year / Table) ----------
 function renderMonth(){
   const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
   const H = getHolidays(y);
   const start = new Date(y, m-1, 1);
   const end   = new Date(y, m, 0);
+
   const k = ensureMonth(state,y,m);
   const container = $("#monthView"); container.innerHTML = "";
 
@@ -510,16 +504,19 @@ function renderMonth(){
     const wd = d.getDay(); if(wd===0 || wd===6) continue;
     const ds = dstr(y,m,d.getDate());
     const day = el("div",{className:"day"});
-    day.append(el("div",{className:"date",textContent: d.toLocaleDateString(undefined,{month:"short",day:"numeric"})}));
+    const dateEl = el("div",{className:"date",textContent: d.toLocaleDateString(undefined,{month:"short",day:"numeric"})});
+    day.append(dateEl);
     const hol = H[ds]; if(hol){ day.append(el("div",{className:"holabel",textContent:hol})); }
 
     const mkSlot = (slotName)=>{
       const slot = el("div",{className:"slot"});
       slot.append(el("div",{className:"slot-title",textContent:slotName}));
-      const dz = el("div",{className:"dropzone"}); dz.dataset.ds = ds; dz.dataset.slot = slotName.startsWith("AM")?"AM":"PM";
+      const dz = el("div",{className:"dropzone"});
+      dz.dataset.ds = ds; dz.dataset.slot = slotName.startsWith("AM")?"AM":"PM";
       dz.addEventListener("dragover", e=>e.preventDefault());
       dz.addEventListener("drop", onDropFromPalette);
       slot.append(dz);
+
       const rec = state.months[k][ds] || {AM:[],PM:[],EXTRA:[]};
       const arr = slotName.startsWith("AM") ? rec.AM : rec.PM;
       arr.forEach(item => dz.append(renderEntry(ds, slotName.startsWith("AM")?"AM":"PM", item)));
@@ -535,6 +532,8 @@ function renderMonth(){
 function renderWeek(){
   const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
   const H = getHolidays(y);
+  const today = new Date(y, m-1, 1);
+  // choose week containing the 1st weekday of month
   let firstWeekday = new Date(y, m-1, 1);
   while(firstWeekday.getDay()===0 || firstWeekday.getDay()===6) firstWeekday.setDate(firstWeekday.getDate()+1);
 
@@ -572,11 +571,13 @@ function renderYear(){
     const card = el("div",{className:"card"});
     card.append(el("div",{className:"badge",textContent:MONTHS[m-1]}));
     const inner = el("div",{style:"display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px"});
+    // show first 3 weeks of weekdays mini cells
     const start = new Date(y,m-1,1), end=new Date(y,m,0);
-    let count=0; const k = ensureMonth(state,y,m);
+    let count=0;
     for(let d=new Date(start); d<=end && count<15; d.setDate(d.getDate()+1)){
       if(d.getDay()===0||d.getDay()===6) continue;
       const ds=dstr(y,m,d.getDate());
+      const k = ensureMonth(state,y,m);
       const rec = state.months[k][ds] || {AM:[],PM:[]};
       const cell = el("div",{style:"border:1px solid var(--ring);border-radius:8px;padding:4px;background:#fff;min-height:38px"});
       cell.append(el("div",{style:"font-size:11px;color:#6b7280;text-align:right",textContent:d.getDate()}));
@@ -639,7 +640,7 @@ function setActiveView(which){
 // ---------- Palette ----------
 function refreshPalette(){
   const list = $("#paletteList"); list.innerHTML="";
-  state.palette.forEach((p)=>{
+  state.palette.forEach((p,i)=>{
     const chip = el("div",{className:"taskchip",draggable:true});
     const cb = el("div",{className:"colorbox"}); cb.style.background = p.bg || "#fff";
     const name = el("div",{textContent:p.title});
@@ -658,6 +659,7 @@ function onDropFromPalette(e){
   const data = JSON.parse(e.dataTransfer.getData("text/plain"));
   const ds = e.currentTarget.dataset.ds;
   const slot = e.currentTarget.dataset.slot;
+
   if(data.type==="palette"){
     const item = {title:data.title, bg:data.bg||"#ffffff", font:(data.font||"#000000")};
     placeItem(ds, slot, item, true);
@@ -743,14 +745,29 @@ function exportMonthHTML(){
   w.document.close();
 }
 
-function importCSVFile(file){ const r = new FileReader(); r.onload = () => applyCSV(r.result); r.readAsText(file); }
+function importCSVFile(file){
+  const r = new FileReader();
+  r.onload = () => applyCSV(r.result);
+  r.readAsText(file);
+}
 function importCSVText(text){ applyCSV(text); }
 function applyCSV(text){
   const lines = text.trim().split(/\r?\n/);
   if(!lines.length) { msg("Empty CSV"); return; }
   const head = lines.shift().split(",").map(s=>s.trim().replace(/^"|"$/g,""));
-  const idx = {year: head.indexOf("year"), month: head.indexOf("month"), date: head.indexOf("date"), day: head.indexOf("day"), slot: head.indexOf("slot"), title:head.indexOf("title"), bg:head.indexOf("bg"), font: head.indexOf("font")};
-  if(idx.year<0||idx.month<0||(idx.date<0&&idx.day<0)||idx.slot<0||idx.title<0){ msg("CSV needs columns: year, month, (date OR day), slot, title [, bg, font]"); return; }
+  const idx = {
+    year: head.indexOf("year"),
+    month: head.indexOf("month"),
+    date: head.indexOf("date"),
+    day:  head.indexOf("day"),
+    slot: head.indexOf("slot"),
+    title:head.indexOf("title"),
+    bg:   head.indexOf("bg"),
+    font: head.indexOf("font")
+  };
+  if(idx.year<0||idx.month<0||(idx.date<0&&idx.day<0)||idx.slot<0||idx.title<0){
+    msg("CSV needs columns: year, month, (date OR day), slot, title [, bg, font]"); return;
+  }
   for(const ln of lines){
     if(!ln.trim()) continue;
     const cells = ln.match(/"((?:[^"]|"")*)"|[^,]+/g).map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"'));
@@ -777,7 +794,9 @@ function applyCSV(text){
 }
 
 // ---------- Repeat tools ----------
-function weekdayIndex(name){ return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].findIndex(n=>n.startsWith(name)); }
+function weekdayIndex(name){
+  return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].findIndex(n=>n.startsWith(name));
+}
 function applyRepeat(){
   const taskTitle = $("#repeatTask").value;
   const rule = $("#repeatRule").value;
@@ -788,20 +807,29 @@ function applyRepeat(){
   if(!paletteItem) return;
 
   let start = new Date(y,m-1,1);
+  // generate candidate days for N weeks starting from first week day in month
   let days=[];
   if(rule==="Every weekday (Mon–Fri)"){
     let d=new Date(start);
-    while(d.getMonth()===m-1){ if(d.getDay()>=1 && d.getDay()<=5) days.push(new Date(d)); d.setDate(d.getDate()+1); }
+    for(let i=0;i<weeks*7;i++){
+      if(d.getMonth()!==m-1) break;
+      if(d.getDay()>=1 && d.getDay()<=5) days.push(new Date(d));
+      d.setDate(d.getDate()+1);
+    }
   }else if(rule.startsWith("Every ")){
     const wd = weekdayIndex(rule.split(" ")[1]);
     let d=new Date(start);
     while(d.getMonth()===m-1){ if(d.getDay()===wd) days.push(new Date(d)); d.setDate(d.getDate()+1); }
   }else{
+    // ordinal weekday like "2nd Tuesday"
     const [ord, dayname] = rule.split(" ");
     const ordMap={"1st":1,"2nd":2,"3rd":3,"4th":4,"Last":"Last"};
     const wd = weekdayIndex(dayname);
-    if(ordMap[ord]==="Last"){ let d=lastWeekday(y,m,wd); if(d) days=[d]; }
-    else{ let d=nthWeekday(y,m,wd,ordMap[ord]); if(d) days=[d]; }
+    if(ordMap[ord]==="Last"){
+      let d=lastWeekday(y,m,wd); if(d) days=[d];
+    }else{
+      let d=nthWeekday(y,m,wd,ordMap[ord]); if(d) days=[d];
+    }
   }
 
   const item = {title:paletteItem.title, bg:paletteItem.bg, font:paletteItem.font};
@@ -839,13 +867,14 @@ function copyYearToRange(fromYear, startYear, endYear){
 // ---------- Filters ----------
 let currentFilter = { mode:"all", value:"" };
 function applyFilter(){
+  // Filter only affects Month/Week/Year DOM entries (not data)
   const entries = document.querySelectorAll(".entry");
   entries.forEach(div=>{
     const title = div.querySelector("span")?.textContent || "";
-    const bg = (div.style.background||"").toLowerCase();
+    const bg = div.style.background?.toLowerCase() || "";
     let show = true;
     if(currentFilter.mode==="run"){ show = /run/i.test(title); }
-    else if(currentFilter.mode==="preventive"){ show = /(S\/S\/C|\bC\b|\bC$)/i.test(title); }
+    else if(currentFilter.mode==="preventive"){ show = /(S\/S\/C| C\b| C$)/i.test(title); }
     else if(currentFilter.mode==="color"){ const val=currentFilter.value.toLowerCase().trim(); show = bg.includes(val); }
     else if(currentFilter.mode==="text"){ const val=currentFilter.value.toLowerCase(); show = title.toLowerCase().includes(val); }
     div.style.display = show ? "" : "none";
@@ -854,12 +883,19 @@ function applyFilter(){
 const setFilter = (mode,val="") => { currentFilter={mode,value:val}; applyFilter(); }
 
 // ---------- Backup / Restore / Print ----------
-function backupJSON(){ download("outage_planner_backup.json", JSON.stringify(state,null,2)); }
+function backupJSON(){
+  const blob = JSON.stringify(state,null,2);
+  download("outage_planner_backup.json", blob);
+}
 function restoreJSON(file){
   const r=new FileReader();
-  r.onload=()=>{ try{ const data=JSON.parse(r.result); if(!data||typeof data!=="object") throw 0;
-    state=data; save(); renderCurrent(); refreshPalette(); msg("Schedule restored.");
-  }catch(e){ msg("Invalid backup file."); }};
+  r.onload=()=>{
+    try{
+      const data = JSON.parse(r.result);
+      if(!data || typeof data!=="object") throw 0;
+      state = data; save(); renderCurrent(); msg("Schedule restored.");
+    }catch(e){ msg("Invalid backup file."); }
+  };
   r.readAsText(file);
 }
 function printMonth(){ window.print(); }
@@ -868,28 +904,12 @@ function printMonth(){ window.print(); }
 function buildSelectors(){
   const ys = $("#yearSel"), ms=$("#monthSel");
   ys.innerHTML=""; ms.innerHTML="";
-
-  for(let y=2024; y<=2032; y++){
-    ys.append(el("option",{value:y,textContent:y}));
-  }
-  for(let m=1; m<=12; m++){
-    ms.append(el("option",{value:m,textContent:MONTHS[m-1]}));
-  }
-
+  for(let y=2024; y<=2032; y++) ys.append(el("option",{value:y,textContent:y}));
+  for(let m=1; m<=12; m++) ms.append(el("option",{value:m,textContent:MONTHS[m-1]}));
   ys.value = state.year || new Date().getFullYear();
   ms.value = state.month || (new Date().getMonth()+1);
-
-  ys.addEventListener("change", ()=>{
-    state.year = Number(ys.value);
-    save();
-    renderCurrent();
-  });
-
-  ms.addEventListener("change", ()=>{
-    state.month = Number(ms.value);
-    save();
-    renderCurrent();
-  });
+  ys.addEventListener("change", ()=>{ state.year=Number(ys.value); save(); renderCurrent(); });
+  ms.addEventListener("change", ()=>{ state.month=Number(ms.value); save(); renderCurrent(); });
 }
 
 function bindButtons(){
@@ -903,9 +923,9 @@ function bindButtons(){
   $("#btnCopyMonth").addEventListener("click", copyMonthToAllMonths);
   $("#btnCopyYearRange").addEventListener("click", ()=>{
     $("#yearRangeModal").style.display="flex";
-    $("#cpyFrom").value  = Number($("#yearSel").value);
+    $("#cpyFrom").value = Number($("#yearSel").value);
     $("#cpyStart").value = Number($("#yearSel").value)+1;
-    $("#cpyEnd").value   = Number($("#yearSel").value)+3;
+    $("#cpyEnd").value = Number($("#yearSel").value)+3;
   });
   $("#cpyCancel").addEventListener("click", ()=>$("#yearRangeModal").style.display="none");
   $("#cpyApply").addEventListener("click", ()=>{
@@ -918,21 +938,14 @@ function bindButtons(){
   // Data
   $("#btnBackup").addEventListener("click", backupJSON);
   $("#btnRestore").addEventListener("click", ()=>$("#fileRestore").click());
-  $("#fileRestore").addEventListener("change", e=>{
-    const file=e.target.files?.[0];
-    if(file) restoreJSON(file);
-    e.target.value="";
-  });
+  $("#fileRestore").addEventListener("change", e=>{ const file=e.target.files?.[0]; if(file) restoreJSON(file); e.target.value=""; });
 
   // Share & Print
-  $("#btnPrintMonth").addEventListener("click", ()=>window.print());
+  $("#btnPrintMonth").addEventListener("click", printMonth);
   $("#btnExportHtml").addEventListener("click", exportMonthHTML);
   $("#btnExportCSV").addEventListener("click", exportCSV);
   $("#btnImportCSV").addEventListener("click", ()=>$("#fileImport").click());
-  $("#fileImport").addEventListener("change", e=>{
-    if(e.target.files?.[0]) importCSVFile(e.target.files[0]);
-    e.target.value="";
-  });
+  $("#fileImport").addEventListener("change", e=>{ if(e.target.files?.[0]) importCSVFile(e.target.files[0]); e.target.value=""; });
 
   // Repeat
   $("#btnApplyRepeat").addEventListener("click", applyRepeat);
@@ -942,45 +955,30 @@ function bindButtons(){
   $("#fltRun").addEventListener("click", ()=>setFilter("run"));
   $("#fltPreventive").addEventListener("click", ()=>setFilter("preventive"));
   $("#btnApplyCustom").addEventListener("click", ()=>{
-    const kind=$("#customFilterKind").value;
-    const val =$("#customFilterVal").value||"";
+    const kind=$("#customFilterKind").value, val=$("#customFilterVal").value||"";
     setFilter(kind, val);
   });
 
-  // Cleanup (YES/NO)
+  // Cleanup with YES/NO (no PIN)
   const openConfirm=(title,msg, onYes)=>{
-    $("#confirmTitle").textContent=title;
-    $("#confirmMsg").textContent=msg;
+    $("#confirmTitle").textContent=title; $("#confirmMsg").textContent=msg;
     $("#confirmModal").style.display="flex";
     const yes=$("#cnfYes"), no=$("#cnfNo");
     const close=()=>$("#confirmModal").style.display="none";
-    const cleanup=()=>{
-      yes.removeEventListener("click",yesHandler);
-      no.removeEventListener("click",noHandler);
-      close();
-    };
     const yesHandler=()=>{ onYes(); cleanup(); };
-    const noHandler =()=>cleanup();
-    yes.addEventListener("click", yesHandler);
-    no.addEventListener("click", noHandler);
+    const noHandler=()=>cleanup();
+    function cleanup(){ yes.removeEventListener("click",yesHandler); no.removeEventListener("click",noHandler); close(); }
+    yes.addEventListener("click", yesHandler); no.addEventListener("click", noHandler);
   };
-
   $("#btnClearMonth").addEventListener("click", ()=>{
     const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
     openConfirm("Clear This Month","Are you sure you want to clear all placements for this month?", ()=>{
-      state.months[keyFor(y,m)] = {};
-      save();
-      renderCurrent();
+      state.months[keyFor(y,m)] = {}; save(); renderCurrent();
     });
   });
-
   $("#btnResetAll").addEventListener("click", ()=>{
     openConfirm("Reset Everything","This wipes all months & tasks. Are you sure?", ()=>{
-      state.months = {};
-      state.palette = [];
-      save();
-      renderCurrent();
-      refreshPalette();
+      state.months = {}; state.palette = []; save(); renderCurrent(); refreshPalette();
     });
   });
 }
@@ -989,7 +987,10 @@ function boot(){
   buildSelectors();
   refreshPalette();
   bindButtons();
-  renderMonth(); // default view
-  renderTable(); // prebuild table content
+  renderMonth(); // default
+  renderTable(); // prep table content
 }
 document.addEventListener("DOMContentLoaded", boot);
+</script>
+</body>
+</html>
