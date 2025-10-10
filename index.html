@@ -179,13 +179,15 @@ summary{cursor:pointer}
   <div class="grid">
     <!-- Left column — Task palette -->
     <div class="palette">
-      <header>
-        <div class="sectionlabel">Task palette</div>
-        <div style="display:flex;gap:6px">
-          <button id="btnAdd">+ Add Task</button>
-          <button id="btnEditPalette">Edit Tasks</button>
-        </div>
-      </header>
+<header>
+  <div class="sectionlabel">Task Palette</div>
+  <div style="display:flex;gap:6px;align-items:center;flex:1">
+    <input id="paletteSearch" type="text" placeholder="Search tasks…" style="flex:1;min-width:140px">
+    <button id="btnAdd">+ Add Task</button>
+    <button id="btnEditPalette">Edit Tasks</button>
+  </div>
+</header>
+
 
       <!-- Repeat tool (your wording adapted) -->
       <details style="margin-bottom:8px">
@@ -640,19 +642,38 @@ function setActiveView(which){
 // ---------- Palette ----------
 function refreshPalette(){
   const list = $("#paletteList"); list.innerHTML="";
+  const q = ($("#paletteSearch")?.value || "").toLowerCase().trim();
+
   state.palette.forEach((p,i)=>{
-    const chip = el("div",{className:"taskchip",draggable:true});
+    if(q && !(p.title.toLowerCase().includes(q) || (p.bg||"").toLowerCase().includes(q))) return;
+
+    const chip = el("div",{className:"taskchip",draggable:true, title:`${p.title} • ${p.bg} / ${p.font}`});
     const cb = el("div",{className:"colorbox"}); cb.style.background = p.bg || "#fff";
-    const name = el("div",{textContent:p.title});
-    chip.append(cb, name, el("span",{className:"badge",textContent:p.font||"#000000"}));
-    chip.addEventListener("dragstart", e=>{
-      e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
-    });
+    const name = el("div",{textContent:p.title, style:"flex:1"});
+    const swatch = el("span",{className:"badge",textContent:p.font||"#000000"});
+
+    chip.append(cb, name, swatch);
+
+    if(editMode){
+      const editBtn = el("button",{textContent:"✎", style:"padding:2px 6px"});
+      const delBtn  = el("button",{textContent:"🗑", style:"padding:2px 6px"});
+      editBtn.addEventListener("click", e=>{ e.stopPropagation(); editTask(i); });
+      delBtn.addEventListener("click",  e=>{ e.stopPropagation(); deleteTask(i); });
+      chip.append(editBtn, delBtn);
+      chip.style.cursor = "default";
+    }else{
+      chip.addEventListener("dragstart", e=>{
+        e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
+      });
+    }
+
     list.append(chip);
   });
-  const sel=$("#repeatTask"); sel.innerHTML="";
-  state.palette.forEach(p => sel.append(el("option",{textContent:p.title})));
+
+  // fill repeat combobox
+  const sel=$("#repeatTask"); if(sel){ sel.innerHTML=""; state.palette.forEach(p => sel.append(el("option",{textContent:p.title}))); }
 }
+
 
 function onDropFromPalette(e){
   e.preventDefault();
@@ -900,6 +921,49 @@ function restoreJSON(file){
 }
 function printMonth(){ window.print(); }
 
+  // ===== Palette helpers (Add/Edit/Search) =====
+let editMode = false;
+
+function normalizeHex(s){
+  if(!s) return "";
+  s = s.trim();
+  if(/^#?[0-9a-f]{6}$/i.test(s)) return s.startsWith('#') ? s.toUpperCase() : ('#'+s.toUpperCase());
+  return "";
+}
+function addTaskPrompt(){
+  const title = (prompt("Task title:", "") || "").trim();
+  if(!title) return;
+
+  let bg = normalizeHex(prompt("Background color (hex like #B7DEE4):", "#B7DEE4"));
+  if(!bg){ msg("Invalid hex for background."); return; }
+
+  let font = normalizeHex(prompt("Font color (hex like #000000):", "#000000"));
+  if(!font){ msg("Invalid hex for font."); return; }
+
+  state.palette.push({title, bg, font});
+  save(); refreshPalette();
+}
+function editTask(idx){
+  const item = state.palette[idx];
+  const title = (prompt("Edit title:", item.title) || "").trim();
+  if(!title) return;
+
+  let bg = normalizeHex(prompt("Edit background hex:", item.bg));
+  if(!bg){ msg("Invalid hex for background."); return; }
+
+  let font = normalizeHex(prompt("Edit font hex:", item.font));
+  if(!font){ msg("Invalid hex for font."); return; }
+
+  state.palette[idx] = {title, bg, font};
+  save(); refreshPalette();
+}
+function deleteTask(idx){
+  if(!confirm(`Delete "${state.palette[idx].title}" from palette?`)) return;
+  state.palette.splice(idx,1);
+  save(); refreshPalette();
+}
+
+
 // ---------- UI wiring / boot ----------
 function buildSelectors(){
   const ys = $("#yearSel"), ms=$("#monthSel");
@@ -923,17 +987,60 @@ function bindButtons(){
   $("#btnCopyMonth").addEventListener("click", copyMonthToAllMonths);
   $("#btnCopyYearRange").addEventListener("click", ()=>{
     $("#yearRangeModal").style.display="flex";
-    $("#cpyFrom").value = Number($("#yearSel").value);
+    $("#cpyFrom").value  = Number($("#yearSel").value);
     $("#cpyStart").value = Number($("#yearSel").value)+1;
-    $("#cpyEnd").value = Number($("#yearSel").value)+3;
+    $("#cpyEnd").value   = Number($("#yearSel").value)+3;
   });
-  $("#cpyCancel").addEventListener("click", ()=>$("#yearRangeModal").style.display="none");
+  $("#cpyCancel").addEventListener("click", ()=>$("#yearRangeModal").style.display="none"));
   $("#cpyApply").addEventListener("click", ()=>{
     const f=Number($("#cpyFrom").value), s=Number($("#cpyStart").value), e=Number($("#cpyEnd").value);
     if(!(f&&s&&e) || s>e){ msg("Enter valid years"); return; }
     $("#yearRangeModal").style.display="none";
     copyYearToRange(f,s,e);
   });
+
+  // Data
+  $("#btnBackup").addEventListener("click", backupJSON);
+  $("#btnRestore").addEventListener("click", ()=>$("#fileRestore").click());
+  $("#fileRestore").addEventListener("change", e=>{
+    const file=e.target.files?.[0];
+    if(file) restoreJSON(file);
+    e.target.value="";
+  });
+
+  // Share & Print
+  $("#btnPrintMonth").addEventListener("click", ()=>window.print());
+  $("#btnExportHtml").addEventListener("click", exportMonthHTML);
+  $("#btnExportCSV").addEventListener("click", exportCSV);
+  $("#btnImportCSV").addEventListener("click", ()=>$("#fileImport").click());
+  $("#fileImport").addEventListener("change", e=>{
+    if(e.target.files?.[0]) importCSVFile(e.target.files[0]);
+    e.target.value="";
+  });
+
+  // Repeat
+  $("#btnApplyRepeat").addEventListener("click", applyRepeat);
+
+  // Filters
+  $("#fltAll").addEventListener("click", ()=>setFilter("all"));
+  $("#fltRun").addEventListener("click", ()=>setFilter("run"));
+  $("#fltPreventive").addEventListener("click", ()=>setFilter("preventive"));
+  $("#btnApplyCustom").addEventListener("click", ()=>{
+    const kind=$("#customFilterKind").value, val=$("#customFilterVal").value||"";
+    setFilter(kind, val);
+  });
+
+  // Task palette controls (← keep these OUTSIDE any other handler)
+  $("#btnAdd").addEventListener("click", addTaskPrompt);
+  $("#btnEditPalette").addEventListener("click", ()=>{
+    editMode = !editMode;
+    $("#btnEditPalette").textContent = editMode ? "Done" : "Edit Tasks";
+    $("#paletteTagsHint").style.display = editMode ? "block" : "none";
+    refreshPalette();
+  });
+  $("#paletteSearch").addEventListener("input", refreshPalette);
+}
+
 
   // Data
   $("#btnBackup").addEventListener("click", backupJSON);
