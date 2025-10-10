@@ -978,26 +978,73 @@ function buildSelectors(){
 
 function bindButtons(){
   // Tabs
-  $("#tabMonth").addEventListener("click",()=>renderMonth());
-  $("#tabWeek").addEventListener("click",()=>renderWeek());
-  $("#tabYear").addEventListener("click",()=>renderYear());
-  $("#tabTable").addEventListener("click",()=>{ renderTable(); setActiveView("table"); });
+  $("#tabMonth").addEventListener("click", ()=>renderMonth());
+  $("#tabWeek").addEventListener("click", ()=>renderWeek());
+  $("#tabYear").addEventListener("click", ()=>renderYear());
+  $("#tabTable").addEventListener("click", ()=>{ renderTable(); setActiveView("table"); });
 
   // Scheduling
   $("#btnCopyMonth").addEventListener("click", copyMonthToAllMonths);
   $("#btnCopyYearRange").addEventListener("click", ()=>{
-    $("#yearRangeModal").style.display="flex";
+    $("#yearRangeModal").style.display = "flex";
     $("#cpyFrom").value  = Number($("#yearSel").value);
-    $("#cpyStart").value = Number($("#yearSel").value)+1;
-    $("#cpyEnd").value   = Number($("#yearSel").value)+3;
+    $("#cpyStart").value = Number($("#yearSel").value) + 1;
+    $("#cpyEnd").value   = Number($("#yearSel").value) + 3;
   });
-  $("#cpyCancel").addEventListener("click", ()=>$("#yearRangeModal").style.display="none"));
+  $("#cpyCancel").addEventListener("click", ()=>{ $("#yearRangeModal").style.display = "none"; });
   $("#cpyApply").addEventListener("click", ()=>{
-    const f=Number($("#cpyFrom").value), s=Number($("#cpyStart").value), e=Number($("#cpyEnd").value);
-    if(!(f&&s&&e) || s>e){ msg("Enter valid years"); return; }
-    $("#yearRangeModal").style.display="none";
-    copyYearToRange(f,s,e);
+    const f = Number($("#cpyFrom").value),
+          s = Number($("#cpyStart").value),
+          e = Number($("#cpyEnd").value);
+    if(!(f && s && e) || s > e){ msg("Enter valid years"); return; }
+    $("#yearRangeModal").style.display = "none";
+    copyYearToRange(f, s, e);
   });
+
+  // Data
+  $("#btnBackup").addEventListener("click", backupJSON);
+  $("#btnRestore").addEventListener("click", ()=>$("#fileRestore").click());
+  $("#fileRestore").addEventListener("change", e=>{
+    const file = e.target.files?.[0];
+    if(file) restoreJSON(file);
+    e.target.value = "";
+  });
+
+  // Share & Print
+  $("#btnPrintMonth").addEventListener("click", ()=>window.print());
+  $("#btnExportHtml").addEventListener("click", exportMonthHTML);
+  $("#btnExportCSV").addEventListener("click", exportCSV);
+  $("#btnImportCSV").addEventListener("click", ()=>$("#fileImport").click());
+  $("#fileImport").addEventListener("change", e=>{
+    if(e.target.files?.[0]) importCSVFile(e.target.files[0]);
+    e.target.value = "";
+  });
+
+  // Repeat
+  $("#btnApplyRepeat").addEventListener("click", applyRepeat);
+
+  // Filters
+  $("#fltAll").addEventListener("click", ()=>setFilter("all"));
+  $("#fltRun").addEventListener("click", ()=>setFilter("run"));
+  $("#fltPreventive").addEventListener("click", ()=>setFilter("preventive"));
+  $("#btnApplyCustom").addEventListener("click", ()=>{
+    const kind = $("#customFilterKind").value;
+    const val  = $("#customFilterVal").value || "";
+    setFilter(kind, val);
+  });
+
+  // Task palette controls
+  $("#btnAdd").addEventListener("click", addTaskPrompt);
+  $("#btnEditPalette").addEventListener("click", ()=>{
+    editMode = !editMode;
+    $("#btnEditPalette").textContent = editMode ? "Done" : "Edit Tasks";
+    const hint = $("#paletteTagsHint");
+    if(hint) hint.style.display = editMode ? "block" : "none";
+    refreshPalette();
+  });
+  $("#paletteSearch").addEventListener("input", refreshPalette);
+}
+
 
   // Data
   $("#btnBackup").addEventListener("click", backupJSON);
