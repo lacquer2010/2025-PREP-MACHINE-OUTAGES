@@ -422,506 +422,7 @@ let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
   year: 2025, month: 10 // October as numeric (1..12)
 };
 
-// ---------- Helpers ----------
-function pad(n){ return String(n).padStart(2,"0"); }
-function keyFor(y,m){ return `${y}-${pad(m)}`; }
-function dstr(y,m,day){ return `${y}-${pad(m)}-${pad(day)}`; }
-function isWeekend(d){ const w=d.getDay(); return w===0 || w===6; } // Sun/Sat
-function prevBusiness(d){
-  let x=new Date(d); x.setDate(x.getDate()-1);
-  while(isWeekend(x)) x.setDate(x.getDate()-1);
-  return x;
-}
-function ensureMonth(state,y,m){
-  const k = keyFor(y,m);
-  if(!state.months[k]) state.months[k] = {};
-  return k;
-}
-function msg(t){ const n=$("#msg"); n.textContent=t; n.style.display="block"; setTimeout(()=>n.style.display="none",3000); }
-function save(){ localStorage.setItem("outagePlanner_v34", JSON.stringify(state)); }
-
-// ---------- Holidays ----------
-function easter(year){
-  const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4);
-  const e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
-  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
-  const m=Math.floor((a+11*h+22*l)/451);
-  const month=Math.floor((h+l-7*m+114)/31);
-  const day=((h+l-7*m+114)%31)+1;
-  return new Date(year, month-1, day);
-}
-function nthWeekday(year,month,weekday,n){
-  const d=new Date(year,month-1,1); let count=0;
-  while(d.getMonth()===month-1){ if(d.getDay()===weekday){ count++; if(count===n) return new Date(d); } d.setDate(d.getDate()+1); }
-  return null;
-}
-function lastWeekday(year,month,weekday){
-  const d=new Date(year,month,0);
-  while(d.getDay()!==weekday) d.setDate(d.getDate()-1);
-  return d;
-}
-function holidayMap(year){
-  const H={}; const add=(dt, label, observe=true)=>{
-    const k=dstr(dt.getFullYear(), dt.getMonth()+1, dt.getDate()); H[k]=label;
-    if(observe){
-      const wd=dt.getDay();
-      if(wd===6){ const o=new Date(dt); o.setDate(o.getDate()-1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
-      if(wd===0){ const o=new Date(dt); o.setDate(o.getDate()+1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
-    }
-  };
-  add(new Date(year,0,1),"New Year’s Day");
-  H[dstr(year,1, nthWeekday(year,2,1,3).getDate())] = "Presidents Day";
-  H[dstr(year,0, nthWeekday(year,1,1,3).getDate())] = "MLK Day";
-  H[dstr(year,4, lastWeekday(year,5,1).getDate())]  = "Memorial Day";
-  add(new Date(year,5,19),"Juneteenth");
-  add(new Date(year,6,4),"Independence Day");
-  H[dstr(year,9, nthWeekday(year,10,1,2).getDate())]  = "Columbus Day";
-  add(new Date(year,10,11),"Veterans Day");
-  const thx = nthWeekday(year,11,4,4); H[dstr(thx.getFullYear(),12,thx.getDate())]="Thanksgiving";
-  const bf = new Date(thx); bf.setDate(bf.getDate()+1); H[dstr(bf.getFullYear(),12,bf.getDate())]="Black Friday";
-  H[dstr(year,12,24)]="Christmas Eve"; add(new Date(year,11,25),"Christmas Day"); H[dstr(year,12,31)]="New Year’s Eve";
-  const eas = easter(year); H[dstr(eas.getFullYear(), eas.getMonth()+1, eas.getDate())] = "Easter";
-  const gf = new Date(eas); gf.setDate(gf.getDate()-2); H[dstr(gf.getFullYear(), gf.getMonth()+1, gf.getDate())] = "Good Friday";
-  return H;
-}
-const holidayCache = {};
-function getHolidays(y){ if(!holidayCache[y]) holidayCache[y]=holidayMap(y); return holidayCache[y]; }
-
-// ---------- Rendering (Month / Week / Year / Table) ----------
-function renderMonth(){
-  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
-  const H = getHolidays(y);
-  const start = new Date(y, m-1, 1);
-  const end   = new Date(y, m, 0);
-
-  const k = ensureMonth(state,y,m);
-  const container = $("#monthView"); container.innerHTML = "";
-
-  const head = el("div",{className:"weekdays"});
-  WEEKDAYS.forEach(w => head.append(el("div",{textContent:w, className:"badge"})));
-  container.append(head);
-
-  const grid = el("div",{className:"weekgrid"});
-  for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
-    const wd = d.getDay(); if(wd===0 || wd===6) continue;
-    const ds = dstr(y,m,d.getDate());
-    const day = el("div",{className:"day"});
-    const dateEl = el("div",{className:"date",textContent: d.toLocaleDateString(undefined,{month:"short",day:"numeric"})});
-    day.append(dateEl);
-    const hol = H[ds]; if(hol){ day.append(el("div",{className:"holabel",textContent:hol})); }
-
-    const mkSlot = (slotName)=>{
-      const slot = el("div",{className:"slot"});
-      slot.append(el("div",{className:"slot-title",textContent:slotName}));
-      const dz = el("div",{className:"dropzone"});
-      dz.dataset.ds = ds; dz.dataset.slot = slotName.startsWith("AM")?"AM":"PM";
-      dz.addEventListener("dragover", e=>e.preventDefault());
-      dz.addEventListener("drop", onDropFromPalette);
-      slot.append(dz);
-
-      const rec = state.months[k][ds] || {AM:[],PM:[],EXTRA:[]};
-      const arr = slotName.startsWith("AM") ? rec.AM : rec.PM;
-      arr.forEach(item => dz.append(renderEntry(ds, slotName.startsWith("AM")?"AM":"PM", item)));
-      return slot;
-    };
-    day.append(mkSlot("AM"), mkSlot("PM"));
-    grid.append(day);
-  }
-  container.append(grid);
-  setActiveView("month");
-}
-
-function renderWeek(){
-  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
-  const H = getHolidays(y);
-  const today = new Date(y, m-1, 1);
-  // choose week containing the 1st weekday of month
-  let firstWeekday = new Date(y, m-1, 1);
-  while(firstWeekday.getDay()===0 || firstWeekday.getDay()===6) firstWeekday.setDate(firstWeekday.getDate()+1);
-
-  const weekHead = $("#weekHead"); const weekGrid=$("#weekGrid");
-  weekHead.innerHTML=""; weekGrid.innerHTML="";
-  WEEKDAYS.forEach(w => weekHead.append(el("div",{textContent:w, className:"badge"})));
-
-  const k = ensureMonth(state,y,m);
-  for(let i=0;i<5;i++){
-    const d = new Date(firstWeekday); d.setDate(d.getDate()+i);
-    const ds = dstr(d.getFullYear(), d.getMonth()+1, d.getDate());
-    const day = el("div",{className:"day"});
-    day.append(el("div",{className:"date",textContent:d.toLocaleDateString(undefined,{month:"short",day:"numeric"})}));
-    const hol = H[ds]; if(hol){ day.append(el("div",{className:"holabel",textContent:hol})); }
-
-    const mkSlot = (slotName)=>{
-      const slot = el("div",{className:"slot"}); slot.append(el("div",{className:"slot-title",textContent:slotName}));
-      const dz = el("div",{className:"dropzone"}); dz.dataset.ds = ds; dz.dataset.slot = slotName.startsWith("AM")?"AM":"PM";
-      dz.addEventListener("dragover", e=>e.preventDefault()); dz.addEventListener("drop", onDropFromPalette); slot.append(dz);
-      const rec = state.months[k][ds] || {AM:[],PM:[],EXTRA:[]};
-      const arr = slotName.startsWith("AM") ? rec.AM : rec.PM;
-      arr.forEach(item => dz.append(renderEntry(ds, slotName.startsWith("AM")?"AM":"PM", item)));
-      return slot;
-    };
-    day.append(mkSlot("AM"), mkSlot("PM"));
-    weekGrid.append(day);
-  }
-  setActiveView("week");
-}
-
-function renderYear(){
-  const y = Number($("#yearSel").value);
-  const grid = $("#yearGrid"); grid.innerHTML="";
-  for(let m=1;m<=12;m++){
-    const card = el("div",{className:"card"});
-    card.append(el("div",{className:"badge",textContent:MONTHS[m-1]}));
-    const inner = el("div",{style:"display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px"});
-    // show first 3 weeks of weekdays mini cells
-    const start = new Date(y,m-1,1), end=new Date(y,m,0);
-    let count=0;
-    for(let d=new Date(start); d<=end && count<15; d.setDate(d.getDate()+1)){
-      if(d.getDay()===0||d.getDay()===6) continue;
-      const ds=dstr(y,m,d.getDate());
-      const k = ensureMonth(state,y,m);
-      const rec = state.months[k][ds] || {AM:[],PM:[]};
-      const cell = el("div",{style:"border:1px solid var(--ring);border-radius:8px;padding:4px;background:#fff;min-height:38px"});
-      cell.append(el("div",{style:"font-size:11px;color:#6b7280;text-align:right",textContent:d.getDate()}));
-      if(rec.AM.length||rec.PM.length){
-        const t = (rec.AM[0]?.title || rec.PM[0]?.title || "");
-        cell.append(el("div",{style:"font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis",textContent:t}));
-      }
-      inner.append(cell); count++;
-    }
-    card.append(inner);
-    grid.append(card);
-  }
-  setActiveView("year");
-}
-
-function renderEntry(ds,slot,item){
-  const div = el("div",{className:"entry"});
-  div.style.background = item.bg || "#ffffff";
-  div.style.color = (item.font || "#000000");
-  div.draggable = true;
-  div.addEventListener("dragstart", e=>{
-    e.dataTransfer.setData("text/plain", JSON.stringify({type:"move", ds, slot, item}));
-  });
-  const label = el("span",{textContent:item.title});
-  const x = el("span",{className:"x",textContent:"✕"});
-  x.addEventListener("click", ()=>removeEntry(ds,slot,item));
-  div.append(label,x);
-  return div;
-}
-
-function renderTable(){
-  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
-  const k = ensureMonth(state,y,m), body = $("#tableBody"); body.innerHTML="";
-  const days = Object.keys(state.months[k]).sort();
-  for(const ds of days){
-    const rec = state.months[k][ds]; if(!rec) continue;
-    [["AM",rec.AM],["PM",rec.PM]].forEach(([slot,arr])=>{
-      if(arr.length===0) return;
-      arr.forEach(it=>{
-        const tr = el("tr");
-        tr.append(el("td",{textContent: ds}), el("td",{textContent:slot}),
-                 el("td",{textContent:it.title}), el("td",{textContent:it.bg}), el("td",{textContent:it.font}));
-        body.append(tr);
-      });
-    });
-  }
-}
-
-function setActiveView(which){
-  $("#tabMonth").classList.toggle("active", which==="month");
-  $("#tabWeek").classList.toggle("active", which==="week");
-  $("#tabYear").classList.toggle("active", which==="year");
-  $("#tabTable").classList.toggle("active", which==="table");
-  $("#monthView").style.display = which==="month" ? "block" : "none";
-  $("#weekView").style.display  = which==="week"  ? "block" : "none";
-  $("#yearView").style.display  = which==="year"  ? "block" : "none";
-  $("#tableView").style.display = which==="table" ? "block" : "none";
-}
-
-// ---------- Palette ----------
-function refreshPalette(){
-  const list = $("#paletteList"); list.innerHTML="";
-  const q = ($("#paletteSearch")?.value || "").toLowerCase().trim();
-
-  state.palette.forEach((p,i)=>{
-    if(q && !(p.title.toLowerCase().includes(q) || (p.bg||"").toLowerCase().includes(q))) return;
-
-    const chip = el("div",{className:"taskchip",draggable:true, title:`${p.title} • ${p.bg} / ${p.font}`});
-    const cb = el("div",{className:"colorbox"}); cb.style.background = p.bg || "#fff";
-    const name = el("div",{textContent:p.title, style:"flex:1"});
-    const swatch = el("span",{className:"badge",textContent:p.font||"#000000"});
-
-    chip.append(cb, name, swatch);
-
-    if(editMode){
-      const editBtn = el("button",{textContent:"✎", style:"padding:2px 6px"});
-      const delBtn  = el("button",{textContent:"🗑", style:"padding:2px 6px"});
-      editBtn.addEventListener("click", e=>{ e.stopPropagation(); editTask(i); });
-      delBtn.addEventListener("click",  e=>{ e.stopPropagation(); deleteTask(i); });
-      chip.append(editBtn, delBtn);
-      chip.style.cursor = "default";
-    }else{
-      chip.addEventListener("dragstart", e=>{
-        e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
-      });
-    }
-
-    list.append(chip);
-  });
-
-  // fill repeat combobox
-  const sel=$("#repeatTask"); if(sel){ sel.innerHTML=""; state.palette.forEach(p => sel.append(el("option",{textContent:p.title}))); }
-}
-
-
-function onDropFromPalette(e){
-  e.preventDefault();
-  const data = JSON.parse(e.dataTransfer.getData("text/plain"));
-  const ds = e.currentTarget.dataset.ds;
-  const slot = e.currentTarget.dataset.slot;
-
-  if(data.type==="palette"){
-    const item = {title:data.title, bg:data.bg||"#ffffff", font:(data.font||"#000000")};
-    placeItem(ds, slot, item, true);
-  }else if(data.type==="move"){
-    removeEntry(data.ds, data.slot, data.item, false);
-    placeItem(ds, slot, data.item, true);
-  }
-}
-
-function removeEntry(ds,slot,item, saveAfter=true){
-  const [y,m] = ds.split("-").map(Number);
-  const k = ensureMonth(state,y,m);
-  const arr = state.months[k][ds]?.[slot] || [];
-  const idx = arr.findIndex(x => x.title===item.title && x.bg===item.bg && x.font===item.font);
-  if(idx>-1){ arr.splice(idx,1); if(saveAfter){ save(); renderCurrent(); } }
-}
-
-function placeItem(ds,slot,item, shiftForHoliday){
-  const [y,m,d] = ds.split("-").map(n=>Number(n));
-  const H = getHolidays(y);
-  let dateObj = new Date(y, m-1, d);
-  if(shiftForHoliday && H[ds]){
-    let p = prevBusiness(dateObj);
-    while(getHolidays(p.getFullYear())[dstr(p.getFullYear(),p.getMonth()+1,p.getDate())]) p = prevBusiness(p);
-    dateObj = p;
-  }
-  const nds = dstr(dateObj.getFullYear(), dateObj.getMonth()+1, dateObj.getDate());
-  const k = ensureMonth(state, dateObj.getFullYear(), dateObj.getMonth()+1);
-  if(!state.months[k][nds]) state.months[k][nds] = {AM:[],PM:[],EXTRA:[]};
-  state.months[k][nds][slot].push(item);
-  save(); renderCurrent();
-}
-
-function renderCurrent(){
-  const which = $("#tabMonth").classList.contains("active") ? "month" :
-                $("#tabWeek").classList.contains("active")  ? "week"  :
-                $("#tabYear").classList.contains("active")  ? "year"  : "table";
-  if(which==="month") renderMonth();
-  else if(which==="week") renderWeek();
-  else if(which==="year") renderYear();
-  else { renderTable(); setActiveView("table"); }
-}
-
-// ---------- Export / Import ----------
-function exportCSV(){
-  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
-  const k = ensureMonth(state,y,m);
-  let out = "year,month,date,slot,title,bg,font\n";
-  for(const ds of Object.keys(state.months[k]).sort()){
-    const rec = state.months[k][ds]; if(!rec) continue;
-    [["AM",rec.AM],["PM",rec.PM]].forEach(([slot,arr])=>{
-      if(arr.length===0){
-        out += `${y},${m},${ds},${slot},,,\n`;
-      }else{
-        arr.forEach(it=> out += `${y},${m},${ds},${slot},${csvEscape(it.title)},${it.bg||""},${it.font||""}\n`);
-      }
-    });
-  }
-  download("placements_"+y+"_"+pad(m)+".csv", out);
-}
-function csvEscape(s){ if(!s) return ""; if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"'; return s; }
-function download(name,text){
-  const a=el("a",{href:"data:text/plain;charset=utf-8,"+encodeURIComponent(text),download:name}); document.body.append(a); a.click(); a.remove();
-}
-
-function exportMonthHTML(){
-  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
-  const w = window.open("","_blank");
-  const title = `${MONTHS[m-1]} ${y} — Outage Planner`;
-  const cont = $("#monthView").innerHTML;
-  w.document.write(`<!doctype html><meta charset="utf-8"><title>${title}</title>
-  <style>
-    body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111;margin:16px}
-    .weekdays,.weekgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-    .badge{padding:2px 6px;border:1px solid #ccc;border-radius:999px;font-size:12px;text-align:center}
-    .day{position:relative;border:1px solid #ccc;border-radius:10px;min-height:120px;padding:8px;background:#fff}
-    .date{position:absolute;top:6px;right:8px;font-size:12px;color:#555}
-    .slot{border:1px dashed #ddd;border-radius:8px;padding:6px;min-height:38px;margin-top:8px;background:#fafafa}
-    .entry{margin-top:4px;padding:4px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;font-weight:600}
-    .x{display:none}
-  </style>
-  <h2>${title}</h2><div>${cont}</div>`);
-  w.document.close();
-}
-
-function importCSVFile(file){
-  const r = new FileReader();
-  r.onload = () => applyCSV(r.result);
-  r.readAsText(file);
-}
-function importCSVText(text){ applyCSV(text); }
-function applyCSV(text){
-  const lines = text.trim().split(/\r?\n/);
-  if(!lines.length) { msg("Empty CSV"); return; }
-  const head = lines.shift().split(",").map(s=>s.trim().replace(/^"|"$/g,""));
-  const idx = {
-    year: head.indexOf("year"),
-    month: head.indexOf("month"),
-    date: head.indexOf("date"),
-    day:  head.indexOf("day"),
-    slot: head.indexOf("slot"),
-    title:head.indexOf("title"),
-    bg:   head.indexOf("bg"),
-    font: head.indexOf("font")
-  };
-  if(idx.year<0||idx.month<0||(idx.date<0&&idx.day<0)||idx.slot<0||idx.title<0){
-    msg("CSV needs columns: year, month, (date OR day), slot, title [, bg, font]"); return;
-  }
-  for(const ln of lines){
-    if(!ln.trim()) continue;
-    const cells = ln.match(/"((?:[^"]|"")*)"|[^,]+/g).map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"'));
-    const y = Number(cells[idx.year]), m = Number(cells[idx.month]);
-    const slot = (cells[idx.slot]||"AM").toUpperCase();
-    const title = (cells[idx.title]||"").trim(); if(!title) continue;
-    let ds = "";
-    if(idx.date>-1){
-      const raw = cells[idx.date].trim();
-      if(/^\d{4}-\d{1,2}-\d{1,2}$/.test(raw)) ds = raw;
-      else if(/^\d{1,2}$/.test(raw)) ds = dstr(y,m,Number(raw));
-      else continue;
-    }else{
-      const day = Number(cells[idx.day]); ds = dstr(y,m,day);
-    }
-    let bg = (cells[idx.bg]||"").trim() || "#ffffff";
-    let font = (cells[idx.font]||"").trim() || "#000000";
-    const k = ensureMonth(state,y,m);
-    if(!state.months[k][ds]) state.months[k][ds] = {AM:[],PM:[],EXTRA:[]};
-    if(slot==="AM"||slot==="PM") state.months[k][ds][slot].push({title,bg,font});
-    else state.months[k][ds].EXTRA.push({title,bg,font});
-  }
-  save(); renderCurrent(); msg("Imported spreadsheet.");
-}
-
-// ---------- Repeat tools ----------
-function weekdayIndex(name){
-  return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].findIndex(n=>n.startsWith(name));
-}
-function applyRepeat(){
-  const taskTitle = $("#repeatTask").value;
-  const rule = $("#repeatRule").value;
-  const slot = $("#repeatSlot").value;
-  const weeks = Math.max(1, Math.min(52, Number($("#repeatWeeks").value)||4));
-  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
-  const paletteItem = state.palette.find(p=>p.title===taskTitle);
-  if(!paletteItem) return;
-
-  let start = new Date(y,m-1,1);
-  // generate candidate days for N weeks starting from first week day in month
-  let days=[];
-  if(rule==="Every weekday (Mon–Fri)"){
-    let d=new Date(start);
-    for(let i=0;i<weeks*7;i++){
-      if(d.getMonth()!==m-1) break;
-      if(d.getDay()>=1 && d.getDay()<=5) days.push(new Date(d));
-      d.setDate(d.getDate()+1);
-    }
-  }else if(rule.startsWith("Every ")){
-    const wd = weekdayIndex(rule.split(" ")[1]);
-    let d=new Date(start);
-    while(d.getMonth()===m-1){ if(d.getDay()===wd) days.push(new Date(d)); d.setDate(d.getDate()+1); }
-  }else{
-    // ordinal weekday like "2nd Tuesday"
-    const [ord, dayname] = rule.split(" ");
-    const ordMap={"1st":1,"2nd":2,"3rd":3,"4th":4,"Last":"Last"};
-    const wd = weekdayIndex(dayname);
-    if(ordMap[ord]==="Last"){
-      let d=lastWeekday(y,m,wd); if(d) days=[d];
-    }else{
-      let d=nthWeekday(y,m,wd,ordMap[ord]); if(d) days=[d];
-    }
-  }
-
-  const item = {title:paletteItem.title, bg:paletteItem.bg, font:paletteItem.font};
-  days.slice(0, weeks*5).forEach(d=>{
-    const ds = dstr(d.getFullYear(), d.getMonth()+1, d.getDate());
-    placeItem(ds, slot, item, true);
-  });
-  msg("Repeat applied.");
-}
-
-// ---------- Scheduling copy helpers ----------
-function copyMonthToAllMonths(){
-  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
-  const k = ensureMonth(state,y,m);
-  const src = JSON.parse(JSON.stringify(state.months[k]||{}));
-  for(let mm=1; mm<=12; mm++){
-    if(mm===m) continue;
-    const k2 = ensureMonth(state,y,mm);
-    state.months[k2] = JSON.parse(JSON.stringify(src));
-  }
-  save(); msg("Copied to all months of "+y); renderCurrent();
-}
-function copyYearToRange(fromYear, startYear, endYear){
-  for(let y=startYear; y<=endYear; y++){
-    if(y===fromYear) continue;
-    for(let m=1; m<=12; m++){
-      const kFrom = ensureMonth(state, fromYear, m);
-      const kTo   = ensureMonth(state, y, m);
-      state.months[kTo] = JSON.parse(JSON.stringify(state.months[kFrom]||{}));
-    }
-  }
-  save(); msg(`Copied ${fromYear} → ${startYear}-${endYear}`); renderCurrent();
-}
-
-// ---------- Filters ----------
-let currentFilter = { mode:"all", value:"" };
-function applyFilter(){
-  // Filter only affects Month/Week/Year DOM entries (not data)
-  const entries = document.querySelectorAll(".entry");
-  entries.forEach(div=>{
-    const title = div.querySelector("span")?.textContent || "";
-    const bg = div.style.background?.toLowerCase() || "";
-    let show = true;
-    if(currentFilter.mode==="run"){ show = /run/i.test(title); }
-    else if(currentFilter.mode==="preventive"){ show = /(S\/S\/C| C\b| C$)/i.test(title); }
-    else if(currentFilter.mode==="color"){ const val=currentFilter.value.toLowerCase().trim(); show = bg.includes(val); }
-    else if(currentFilter.mode==="text"){ const val=currentFilter.value.toLowerCase(); show = title.toLowerCase().includes(val); }
-    div.style.display = show ? "" : "none";
-  });
-}
-const setFilter = (mode,val="") => { currentFilter={mode,value:val}; applyFilter(); }
-
-// ---------- Backup / Restore / Print ----------
-function backupJSON(){
-  const blob = JSON.stringify(state,null,2);
-  download("outage_planner_backup.json", blob);
-}
-function restoreJSON(file){
-  const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const data = JSON.parse(r.result);
-      if(!data || typeof data!=="object") throw 0;
-      state = data; save(); renderCurrent(); msg("Schedule restored.");
-    }catch(e){ msg("Invalid backup file."); }
-  };
-  r.readAsText(file);
-}
-function printMonth(){ window.print(); }
-
-  // ===== Palette helpers (Add/Edit/Search) =====
+// ===== Palette helpers (Add/Edit/Search) =====
 let editMode = false;
 
 function normalizeHex(s){
@@ -963,8 +464,45 @@ function deleteTask(idx){
   save(); refreshPalette();
 }
 
+// ===== Refresh palette (search + edit mode support) =====
+function refreshPalette(){
+  const list = $("#paletteList"); list.innerHTML="";
+  const q = ($("#paletteSearch")?.value || "").toLowerCase().trim();
 
-// ---------- UI wiring / boot ----------
+  state.palette.forEach((p,i)=>{
+    if(q && !(p.title.toLowerCase().includes(q) || (p.bg||"").toLowerCase().includes(q))) return;
+
+    const chip = el("div",{className:"taskchip",draggable:!editMode, title:`${p.title} • ${p.bg} / ${p.font}`});
+    const cb = el("div",{className:"colorbox"}); cb.style.background = p.bg || "#fff";
+    const name = el("div",{textContent:p.title, style:"flex:1"});
+    const swatch = el("span",{className:"badge",textContent:p.font||"#000000"});
+
+    chip.append(cb, name, swatch);
+
+    if(editMode){
+      const editBtn = el("button",{textContent:"✎", style:"padding:2px 6px"});
+      const delBtn  = el("button",{textContent:"🗑", style:"padding:2px 6px"});
+      editBtn.addEventListener("click", e=>{ e.stopPropagation(); editTask(i); });
+      delBtn.addEventListener("click",  e=>{ e.stopPropagation(); deleteTask(i); });
+      chip.append(editBtn, delBtn);
+      chip.style.cursor = "default";
+    }else{
+      chip.addEventListener("dragstart", e=>{
+        e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
+      });
+    }
+
+    list.append(chip);
+  });
+
+  const sel=$("#repeatTask");
+  if(sel){
+    sel.innerHTML="";
+    state.palette.forEach(p => sel.append(el("option",{textContent:p.title})));
+  }
+}
+
+// ===== Build selectors (year/month) =====
 function buildSelectors(){
   const ys = $("#yearSel"), ms=$("#monthSel");
   ys.innerHTML=""; ms.innerHTML="";
@@ -976,11 +514,12 @@ function buildSelectors(){
   ms.addEventListener("change", ()=>{ state.month=Number(ms.value); save(); renderCurrent(); });
 }
 
+// ===== Buttons wiring (corrected) =====
 function bindButtons(){
   // Tabs
   $("#tabMonth").addEventListener("click", ()=>renderMonth());
-  $("#tabWeek").addEventListener("click", ()=>renderWeek());
-  $("#tabYear").addEventListener("click", ()=>renderYear());
+  $("#tabWeek").addEventListener("click",  ()=>renderWeek());
+  $("#tabYear").addEventListener("click",  ()=>renderYear());
   $("#tabTable").addEventListener("click", ()=>{ renderTable(); setActiveView("table"); });
 
   // Scheduling
@@ -988,63 +527,16 @@ function bindButtons(){
   $("#btnCopyYearRange").addEventListener("click", ()=>{
     $("#yearRangeModal").style.display = "flex";
     $("#cpyFrom").value  = Number($("#yearSel").value);
-    $("#cpyStart").value = Number($("#yearSel").value) + 1;
-    $("#cpyEnd").value   = Number($("#yearSel").value) + 3;
+    $("#cpyStart").value = Number($("#yearSel").value)+1;
+    $("#cpyEnd").value   = Number($("#yearSel").value)+3;
   });
   $("#cpyCancel").addEventListener("click", ()=>{ $("#yearRangeModal").style.display = "none"; });
   $("#cpyApply").addEventListener("click", ()=>{
-    const f = Number($("#cpyFrom").value),
-          s = Number($("#cpyStart").value),
-          e = Number($("#cpyEnd").value);
-    if(!(f && s && e) || s > e){ msg("Enter valid years"); return; }
+    const f=Number($("#cpyFrom").value), s=Number($("#cpyStart").value), e=Number($("#cpyEnd").value);
+    if(!(f&&s&&e) || s>e){ msg("Enter valid years"); return; }
     $("#yearRangeModal").style.display = "none";
-    copyYearToRange(f, s, e);
+    copyYearToRange(f,s,e);
   });
-
-  // Data
-  $("#btnBackup").addEventListener("click", backupJSON);
-  $("#btnRestore").addEventListener("click", ()=>$("#fileRestore").click());
-  $("#fileRestore").addEventListener("change", e=>{
-    const file = e.target.files?.[0];
-    if(file) restoreJSON(file);
-    e.target.value = "";
-  });
-
-  // Share & Print
-  $("#btnPrintMonth").addEventListener("click", ()=>window.print());
-  $("#btnExportHtml").addEventListener("click", exportMonthHTML);
-  $("#btnExportCSV").addEventListener("click", exportCSV);
-  $("#btnImportCSV").addEventListener("click", ()=>$("#fileImport").click());
-  $("#fileImport").addEventListener("change", e=>{
-    if(e.target.files?.[0]) importCSVFile(e.target.files[0]);
-    e.target.value = "";
-  });
-
-  // Repeat
-  $("#btnApplyRepeat").addEventListener("click", applyRepeat);
-
-  // Filters
-  $("#fltAll").addEventListener("click", ()=>setFilter("all"));
-  $("#fltRun").addEventListener("click", ()=>setFilter("run"));
-  $("#fltPreventive").addEventListener("click", ()=>setFilter("preventive"));
-  $("#btnApplyCustom").addEventListener("click", ()=>{
-    const kind = $("#customFilterKind").value;
-    const val  = $("#customFilterVal").value || "";
-    setFilter(kind, val);
-  });
-
-  // Task palette controls
-  $("#btnAdd").addEventListener("click", addTaskPrompt);
-  $("#btnEditPalette").addEventListener("click", ()=>{
-    editMode = !editMode;
-    $("#btnEditPalette").textContent = editMode ? "Done" : "Edit Tasks";
-    const hint = $("#paletteTagsHint");
-    if(hint) hint.style.display = editMode ? "block" : "none";
-    refreshPalette();
-  });
-  $("#paletteSearch").addEventListener("input", refreshPalette);
-}
-
 
   // Data
   $("#btnBackup").addEventListener("click", backupJSON);
@@ -1077,73 +569,39 @@ function bindButtons(){
     setFilter(kind, val);
   });
 
-  // Task palette controls (← keep these OUTSIDE any other handler)
+  // Task palette controls
   $("#btnAdd").addEventListener("click", addTaskPrompt);
   $("#btnEditPalette").addEventListener("click", ()=>{
     editMode = !editMode;
     $("#btnEditPalette").textContent = editMode ? "Done" : "Edit Tasks";
-    $("#paletteTagsHint").style.display = editMode ? "block" : "none";
+    const hint = $("#paletteTagsHint"); if(hint) hint.style.display = editMode ? "block" : "none";
     refreshPalette();
   });
   $("#paletteSearch").addEventListener("input", refreshPalette);
 }
 
-
-  // Data
-  $("#btnBackup").addEventListener("click", backupJSON);
-  $("#btnRestore").addEventListener("click", ()=>$("#fileRestore").click());
-  $("#fileRestore").addEventListener("change", e=>{ const file=e.target.files?.[0]; if(file) restoreJSON(file); e.target.value=""; });
-
-  // Share & Print
-  $("#btnPrintMonth").addEventListener("click", printMonth);
-  $("#btnExportHtml").addEventListener("click", exportMonthHTML);
-  $("#btnExportCSV").addEventListener("click", exportCSV);
-  $("#btnImportCSV").addEventListener("click", ()=>$("#fileImport").click());
-  $("#fileImport").addEventListener("change", e=>{ if(e.target.files?.[0]) importCSVFile(e.target.files[0]); e.target.value=""; });
-
-  // Repeat
-  $("#btnApplyRepeat").addEventListener("click", applyRepeat);
-
-  // Filters
-  $("#fltAll").addEventListener("click", ()=>setFilter("all"));
-  $("#fltRun").addEventListener("click", ()=>setFilter("run"));
-  $("#fltPreventive").addEventListener("click", ()=>setFilter("preventive"));
-  $("#btnApplyCustom").addEventListener("click", ()=>{
-    const kind=$("#customFilterKind").value, val=$("#customFilterVal").value||"";
-    setFilter(kind, val);
-  });
-
-  // Cleanup with YES/NO (no PIN)
-  const openConfirm=(title,msg, onYes)=>{
-    $("#confirmTitle").textContent=title; $("#confirmMsg").textContent=msg;
-    $("#confirmModal").style.display="flex";
-    const yes=$("#cnfYes"), no=$("#cnfNo");
-    const close=()=>$("#confirmModal").style.display="none";
-    const yesHandler=()=>{ onYes(); cleanup(); };
-    const noHandler=()=>cleanup();
-    function cleanup(){ yes.removeEventListener("click",yesHandler); no.removeEventListener("click",noHandler); close(); }
-    yes.addEventListener("click", yesHandler); no.addEventListener("click", noHandler);
-  };
-  $("#btnClearMonth").addEventListener("click", ()=>{
-    const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
-    openConfirm("Clear This Month","Are you sure you want to clear all placements for this month?", ()=>{
-      state.months[keyFor(y,m)] = {}; save(); renderCurrent();
-    });
-  });
-  $("#btnResetAll").addEventListener("click", ()=>{
-    openConfirm("Reset Everything","This wipes all months & tasks. Are you sure?", ()=>{
-      state.months = {}; state.palette = []; save(); renderCurrent(); refreshPalette();
-    });
-  });
+// ===== Boot =====
+function renderCurrent(){
+  const which = $("#tabMonth").classList.contains("active") ? "month" :
+                $("#tabWeek").classList.contains("active")  ? "week"  :
+                $("#tabYear").classList.contains("active")  ? "year"  : "table";
+  if(which==="month") renderMonth();
+  else if(which==="week") renderWeek();
+  else if(which==="year") renderYear();
+  else { renderTable(); setActiveView("table"); }
 }
 
 function boot(){
   buildSelectors();
   refreshPalette();
   bindButtons();
-  renderMonth(); // default
-  renderTable(); // prep table content
+  renderMonth();   // default view
+  renderTable();   // prep table
 }
+
+document.addEventListener("DOMContentLoaded", boot);
+
+
 document.addEventListener("DOMContentLoaded", boot);
 </script>
 </body>
