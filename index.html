@@ -1,74 +1,47 @@
+<!-- Outage Planner v3.4 — saved 2025-10-09 OPEN THIS FILE IN WEB BROWSER-->
+
 <!doctype html>
-<!-- Outage Planner v3.5 — single-file build (2025-10-10) -->
-<html lang="en">
+<html>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Outage Planner v3.5</title>
+<title>Outage Planner</title>
 
 <!-- ========== LIGHT THEME CSS ========== -->
 <style>
 :root{
   --bg:#f4f6fb; --card:#ffffff; --ring:#d6d9e0; --text:#0b0f14;
   --muted:#586173; --accent:#2563eb; --grid:#e5e7eb;
-  --danger:#ef4444; --warning:#f59e0b; --success:#10b981;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial
-}
+body{margin:0;background:var(--bg);color:var(--text);
+     font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial}
 .wrap{max-width:1280px;margin:18px auto;padding:0 16px}
-h1{margin:0 0 8px;font-size:24px}
+h1{margin:0 0 10px;font-size:24px}
 small.muted{color:var(--muted)}
-hr.sep{border:none;border-top:1px solid var(--ring);margin:10px 0}
 
-.card{
-  background:var(--card);border:1px solid var(--ring);border-radius:14px;
-  padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.05)
-}
-button{
-  background:#eef2ff;color:#0b0f14;border:1px solid var(--ring);
-  border-radius:10px;padding:8px 10px;cursor:pointer;white-space:nowrap
-}
+.card{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+button{background:#eef2ff;color:#0b0f14;border:1px solid var(--ring);border-radius:10px;padding:8px 10px;cursor:pointer}
 button.primary{background:var(--accent);border-color:transparent;color:#fff}
-button.ghost{background:transparent}
-button.warn{background:#fff7ed;border-color:#fdba74}
-button.danger{background:#fee2e2;border-color:#fecaca}
 button[disabled]{opacity:.5;cursor:not-allowed}
-select,input[type="text"],textarea{
-  background:#fff;border:1px solid var(--ring);color:var(--text);
-  border-radius:8px;padding:6px 8px;width:100%
-}
-label > small{display:block;margin-bottom:4px}
+select,textarea{background:#fff;border:1px solid var(--ring);color:var(--text);border-radius:8px;padding:6px 8px}
 textarea{width:100%;min-height:180px}
-
 .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
-.viewtabs{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.viewtabs{margin-top:8px;display:flex;gap:8px}
 .viewtabs button.active{background:var(--accent);border-color:transparent;color:#fff}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:12px}
 
-.grid{display:grid;grid-template-columns:320px 1fr 260px;gap:12px}
-.leftcol .palette{
-  background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px;
-  max-height:76vh;overflow:auto
-}
-.palette header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap}
-.taskchip{
-  display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;
-  border-left:6px solid var(--accent);background:#fbfdff;border:1px solid var(--ring);
-  margin:6px 0;cursor:grab;color:var(--text)
-}
+.palette{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px;max-height:72vh;overflow:auto}
+.palette header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.taskchip{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;border-left:6px solid var(--accent);background:#fbfdff;border:1px solid var(--ring);margin:6px 0;cursor:grab;color:var(--text)}
 .taskchip .colorbox{width:16px;height:16px;border-radius:4px;border:1px solid var(--ring)}
 .badge{display:inline-block;padding:2px 6px;border-radius:999px;border:1px solid var(--ring);font-size:12px;background:#fff}
-.banner{margin:10px 0;padding:8px;border-radius:10px;border:1px solid var(--ring")}
+.banner{margin:10px 0;padding:8px;border-radius:10px;border:1px solid var(--ring)}
 .info{background:#f6f8ff}
 .error{background:#fff1f2;border-color:#fecdd3;color:#7f1d1d}
-.success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
 
-.calendar,.tablewrap,.yearwrap,.weekwrap{
-  background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px
-}
+.calendar{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px}
 .weekdays{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:6px}
 .weekgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .day{border:1px solid var(--ring);border-radius:10px;min-height:120px;padding:8px;background:#fff;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.04)}
@@ -77,30 +50,22 @@ textarea{width:100%;min-height:180px}
 .slot{border:1px dashed var(--grid);border-radius:8px;padding:6px;min-height:38px;margin-top:8px;background:#fafcff}
 .slot-title{font-size:11px;color:#6b7280}
 .dropzone{min-height:24px}
-.entry{
-  margin-top:4px;padding:4px 8px;border-radius:8px;border-left:5px solid var(--accent);
-  background:#fff !important;color:#000 !important;display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--ring);box-shadow:0 1px 3px rgba(0,0,0,.06);font-weight:600
-}
-.entry .x{cursor:pointer;font-weight:bold;color:#334155}
-.entry[style*="#ff0000"]{color:#fff !important} /* improve contrast for pure red */
 
-.tablewrap table{width:100%;border-collapse:collapse;background:#fff}
-.tablewrap thead th{font-size:12px;color:#475569;text-align:left;border-bottom:1px solid var(--ring);padding:8px;background:#f7f8fb}
-.tablewrap tbody td{padding:8px;border-bottom:1px dashed var(--grid);color:#0b0f14}
+.entry{margin-top:4px;padding:4px 8px;border-radius:8px;border-left:5px solid var(--accent);background:#fff !important;color:#000 !important;display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--ring);box-shadow:0 1px 3px rgba(0,0,0,.06);font-weight:600}
+.entry .x{cursor:pointer;font-weight:bold;color:#334155}
+.entry[style*="#ff0000"]{color:#fff !important} /* red bg → white text */
+
+.tablewrap{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px}
+table{width:100%;border-collapse:collapse;background:#fff}
+thead th{font-size:12px;color:#475569;text-align:left;border-bottom:1px solid var(--ring);padding:8px;background:#f7f8fb}
+tbody td{padding:8px;border-bottom:1px dashed var(--grid);color:#0b0f14}
 
 .controls-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .controls-row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 summary{cursor:pointer}
 
-.rightcol .group{margin-bottom:10px}
-.rightcol .group h4{margin:0 0 6px;font-size:13px;color:#334155}
-.rightcol .stack{display:flex;flex-wrap:wrap;gap:8px}
-
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
 .modal .inner{background:#fff;border:1px solid var(--ring);border-radius:12px;max-width:760px;width:100%;padding:12px;color:#0b0f14}
-.modal footer{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-kbd{background:#f3f4f6;border:1px solid #e5e7eb;border-bottom-color:#d1d5db;border-radius:6px;padding:0 6px}
-.hidden{display:none !important}
 </style>
 </head>
 
@@ -109,274 +74,128 @@ kbd{background:#f3f4f6;border:1px solid #e5e7eb;border-bottom-color:#d1d5db;bord
   <h1>Outage Planner</h1>
 
   <div class="toolbar">
-    <!-- Left control card -->
     <div class="card">
       <div class="controls-row">
         <div>
-          <label><small class="muted">Year</small></label>
+          <label><small class="muted">Year</small></label><br>
           <select id="yearSel"></select>
         </div>
         <div>
-          <label><small class="muted">Month</small></label>
+          <label><small class="muted">Month</small></label><br>
           <select id="monthSel"></select>
         </div>
       </div>
-
       <div class="viewtabs">
-        <button id="tabMonth" class="active">Month View</button>
-        <button id="tabWeek">Week View</button>
-        <button id="tabYear">Year View</button>
-        <button id="tabTable">Table View</button>
+        <button id="tabMonth" class="active">Month view</button>
+        <button id="tabTable">Table view</button>
       </div>
-
-      <div class="banner info">
-        <small class="muted">
-          Drag from palette or move existing entries. Weekends are excluded.
-          Holidays are labeled in <b>yellow</b>. Items dropped on a holiday shift to the <b>previous business day</b>.
-          >2 items spill into an <b>EXTRA</b> stack. Empty weekdays export as <b>gray</b>.
-        </small>
-      </div>
+      <div class="banner info"><small class="muted">
+        Drag from palette or move existing entries. Weekends are excluded.
+        Holidays are labeled (observed days included) in <b>yellow</b>. If a
+        task lands on a holiday it shifts to the <b>previous business day</b>.
+        More than two items spill into an <b>EXTRA</b> stack. Empty weekdays export as <b>gray</b>.
+      </small></div>
     </div>
 
-    <!-- Right control card (quick actions / messages) -->
     <div class="card">
-      <label><small class="muted">Quick Messages</small></label>
-      <div id="msg" class="banner error hidden"></div>
-      <div id="ok" class="banner success hidden"></div>
-      <small class="muted">Tip: Clear cache for testing: <kbd>localStorage.removeItem('outagePlanner_v34')</kbd>. Reload with <kbd>Ctrl</kbd>+<kbd>F5</kbd>.</small>
+      <label><small class="muted">Tools</small></label><br>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+        <button id="btnCopyMonth">Repeat this month → all months (weekdays)</button>
+        <button id="btnCopyYearRange">Repeat this year → year range</button>
+        <button id="btnExportHtml">Export month as printable HTML</button>
+        <button id="btnExportCSV">Export placements CSV</button>
+        <input type="file" id="fileImport" accept=".csv" style="display:none">
+        <button id="btnImportCSV">Import placements CSV</button>
+        <button id="btnSeedCSV">Paste seed CSV</button>
+        <button id="btnReset">Reset month</button>
+      </div>
+      <div id="msg" class="banner error" style="display:none;margin-top:8px"></div>
     </div>
   </div>
 
   <div class="grid">
-    <!-- LEFT: PALETTE -->
-    <div class="leftcol">
-      <div class="palette">
-        <header>
-          <strong>Task Palette</strong>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button id="btnAdd">+ Add Task</button>
-            <button id="btnEditPalette" class="ghost" aria-pressed="false">Edit Tasks</button>
-          </div>
-        </header>
-
-        <div class="controls-row">
-          <div>
-            <label><small class="muted">Search tasks…</small></label>
-            <input id="paletteSearch" type="text" placeholder="Type to filter"/>
-          </div>
-          <div>
-            <label><small class="muted">Repeat — Apply to current month</small></label>
-            <div class="controls-row">
-              <select id="repeatPattern">
-                <option value="wkday">Every Weekday (Mon–Fri)</option>
-                <option value="mon">Every Monday</option>
-                <option value="tue">Every Tuesday</option>
-                <option value="wed">Every Wednesday</option>
-                <option value="thu">Every Thursday</option>
-                <option value="fri">Every Friday</option>
-                <option value="1mon">1st Monday</option><option value="2mon">2nd Monday</option><option value="3mon">3rd Monday</option><option value="4mon">4th Monday</option><option value="lmon">Last Monday</option>
-                <option value="1tue">1st Tuesday</option><option value="2tue">2nd Tuesday</option><option value="3tue">3rd Tuesday</option><option value="4tue">4th Tuesday</option><option value="ltue">Last Tuesday</option>
-                <option value="1wed">1st Wednesday</option><option value="2wed">2nd Wednesday</option><option value="3wed">3rd Wednesday</option><option value="4wed">4th Wednesday</option><option value="lwed">Last Wednesday</option>
-                <option value="1thu">1st Thursday</option><option value="2thu">2nd Thursday</option><option value="3thu">3rd Thursday</option><option value="4thu">4th Thursday</option><option value="lthu">Last Thursday</option>
-                <option value="1fri">1st Friday</option><option value="2fri">2nd Friday</option><option value="3fri">3rd Friday</option><option value="4fri">4th Friday</option><option value="lfri">Last Friday</option>
-              </select>
-              <select id="repeatSlot"><option>AM</option><option>PM</option></select>
-            </div>
-          </div>
+    <div class="palette">
+      <header>
+        <strong>Task palette</strong>
+        <div style="display:flex;gap:6px">
+          <button id="btnAdd">+ Add</button>
+          <button id="btnEditPalette">Edit palette</button>
         </div>
-        <div class="controls-row">
+      </header>
+
+      <details style="margin-bottom:8px">
+        <summary><strong>Create repeating placements</strong></summary>
+        <div class="controls-row-3" style="margin-top:8px">
           <div>
-            <label><small class="muted">Task to repeat</small></label>
+            <label><small class="muted">Task</small></label><br>
             <select id="repeatTask"></select>
           </div>
-          <div style="align-self:end">
-            <button id="btnApplyRepeat" class="primary" style="width:100%">Apply</button>
+          <div>
+            <label><small class="muted">Rule</small></label><br>
+            <select id="repeatRule">
+              <option>Every weekday (Mon–Fri)</option>
+              <option>Every Monday</option>
+              <option>Every Tuesday</option>
+              <option>Every Wednesday</option>
+              <option>Every Thursday</option>
+              <option>Every Friday</option>
+              <option>1st Monday</option><option>2nd Monday</option><option>3rd Monday</option><option>4th Monday</option><option>Last Monday</option>
+              <option>1st Tuesday</option><option>2nd Tuesday</option><option>3rd Tuesday</option><option>4th Tuesday</option><option>Last Tuesday</option>
+              <option>1st Wednesday</option><option>2nd Wednesday</option><option>3rd Wednesday</option><option>4th Wednesday</option><option>Last Wednesday</option>
+              <option>1st Thursday</option><option>2nd Thursday</option><option>3rd Thursday</option><option>4th Thursday</option><option>Last Thursday</option>
+              <option>1st Friday</option><option>2nd Friday</option><option>3rd Friday</option><option>4th Friday</option><option>Last Friday</option>
+            </select>
+          </div>
+          <div>
+            <label><small class="muted">Slot</small></label><br>
+            <select id="repeatSlot"><option>AM</option><option>PM</option></select>
           </div>
         </div>
+        <button id="btnApplyRepeat" class="primary" style="margin-top:8px">Apply to current month</button>
+      </details>
 
-        <hr class="sep"/>
-
-        <div id="paletteList"></div>
-      </div>
+      <div id="paletteList"></div>
     </div>
 
-    <!-- CENTER: VIEWS -->
-    <div class="centercol">
+    <div>
       <div id="monthView" class="calendar"></div>
-      <div id="weekView" class="weekwrap hidden"></div>
-      <div id="yearView" class="yearwrap hidden"></div>
-      <div id="tableView" class="tablewrap hidden">
+      <div id="tableView" class="tablewrap" style="display:none">
         <table>
-          <thead>
-            <tr><th>Date</th><th>Slot</th><th>Title</th><th>BG</th><th>Font</th></tr>
-          </thead>
+          <thead><tr><th>Date</th><th>Slot</th><th>Title</th><th>BG</th><th>Font</th></tr></thead>
           <tbody id="tableBody"></tbody>
         </table>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- RIGHT: TOOLS -->
-    <div class="rightcol">
-      <div class="card group">
-        <h4>Scheduling</h4>
-        <div class="stack">
-          <button id="btnCopyMonth">Copy to All Months</button>
-          <button id="btnCopyYears">Copy to Other Years</button>
-        </div>
-      </div>
-
-      <div class="card group">
-        <h4>Data</h4>
-        <div class="stack">
-          <button id="btnBackup" title="Save full state as .json">Back Up Schedule</button>
-          <input id="restoreFile" type="file" accept=".json" class="hidden" />
-          <button id="btnRestore">Restore Schedule</button>
-        </div>
-      </div>
-
-      <div class="card group">
-        <h4>Share & Print</h4>
-        <div class="stack">
-          <button id="btnPrintMonth">Print Month</button>
-          <button id="btnShareHtml">Share as HTML</button>
-          <button id="btnExportCSV">Export to Spreadsheet</button>
-          <input id="importFile" type="file" accept=".csv" class="hidden"/>
-          <button id="btnImportCSV">Import Spreadsheet</button>
-        </div>
-      </div>
-
-      <div class="card group">
-        <h4>Filters</h4>
-        <div class="stack">
-          <button id="fltAll" class="primary">Show All</button>
-          <button id="fltPreventive">Only Preventive</button>
-          <button id="fltRun">Only Run</button>
-          <button id="fltCustom" title="Filter by color hex or text">Custom…</button>
-        </div>
-      </div>
-
-      <div class="card group">
-        <h4>Cleanup</h4>
-        <div class="stack">
-          <button id="btnClearMonth" class="warn">Clear This Month</button>
-          <button id="btnResetAll" class="danger">Reset Everything</button>
-        </div>
-      </div>
+<!-- Paste Seed Modal -->
+<div id="seedModal" class="modal">
+  <div class="inner">
+    <h3>Paste seed CSV</h3>
+    <p style="margin-top:0"><small class="muted">
+      Columns required: <b>year,month,date,slot,title,bg,font</b> — OR use <b>day</b> instead of <b>date</b>.
+      Example rows:<br>
+      2025,8,2025-08-01,AM,QUAD RUN,#b1a0c7,#000000<br>
+      2025,8,1,PM,BF3 RUN,#b7dee8,#000000
+    </small></p>
+    <textarea id="seedText" placeholder="Paste CSV here…"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="seedCancel">Cancel</button>
+      <button id="seedApply" class="primary">Apply</button>
     </div>
-  </div>
-</div>
-
-<!-- ======= MODALS ======= -->
-<div id="modalPrompt" class="modal" role="dialog" aria-modal="true">
-  <div class="inner">
-    <h3 id="modalTitle">Confirm</h3>
-    <p id="modalText"></p>
-    <footer>
-      <button id="modalCancel">Cancel</button>
-      <button id="modalOk" class="primary">OK</button>
-    </footer>
-  </div>
-</div>
-
-<div id="modalCustom" class="modal" role="dialog" aria-modal="true">
-  <div class="inner">
-    <h3>Custom Filter</h3>
-    <p><small class="muted">Enter a keyword (in title) or a hex color (bg or font), e.g. <kbd>RUN</kbd> or <kbd>#ff0000</kbd>.</small></p>
-    <input id="customFilterInput" type="text" placeholder="RUN or #ff0000"/>
-    <footer>
-      <button id="customCancel">Cancel</button>
-      <button id="customApply" class="primary">Apply</button>
-    </footer>
   </div>
 </div>
 
 <!-- ========== APP LOGIC ========== -->
 <script>
-/* ---------- tiny helpers ---------- */
 const $ = sel => document.querySelector(sel);
-const $$ = sel => Array.from(document.querySelectorAll(sel));
 const el = (t,props={}) => Object.assign(document.createElement(t),props);
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const WEEKDAYS = ["Mon","Tue","Wed","Thu","Fri"];
-const pad = n => String(n).padStart(2,"0");
-const dstr = (y,m,d)=>`${y}-${pad(m)}-${pad(d)}`;
-const keyFor = (y,m)=>`${y}-${pad(m)}`;
-const isWeekend = d => (d.getDay()===0||d.getDay()===6);
-const show = (n,yes)=> n.classList[yes?"remove":"add"]("hidden");
-const msg = t => { const n=$("#msg"); n.textContent=t; show(n,true); setTimeout(()=>show(n,false),3000); };
-const ok  = t => { const n=$("#ok"); n.textContent=t; show(n,true); setTimeout(()=>show(n,false),2500); };
-const download = (name,text,mime="text/plain;charset=utf-8")=>{
-  const a=el("a",{href:`data:${mime},`+encodeURIComponent(text),download:name}); document.body.append(a); a.click(); a.remove();
-};
-function save(){ localStorage.setItem("outagePlanner_v34", JSON.stringify(state)); }
 
-/* ---------- holidays ---------- */
-function prevBusiness(d){ let x=new Date(d); x.setDate(x.getDate()-1); while(isWeekend(x)) x.setDate(x.getDate()-1); return x; }
-function easter(year){
-  const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4);
-  const e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
-  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
-  const m=Math.floor((a+11*h+22*l)/451);
-  const month=Math.floor((h+l-7*m+114)/31);
-  const day=((h+l-7*m+114)%31)+1;
-  return new Date(year, month-1, day);
-}
-function nthWeekday(year,month,weekday,n){ const d=new Date(year,month-1,1); let c=0; while(d.getMonth()===month-1){ if(d.getDay()===weekday){ c++; if(c===n) return new Date(d);} d.setDate(d.getDate()+1);} return null; }
-function lastWeekday(year,month,weekday){ const d=new Date(year,month,0); while(d.getDay()!==weekday) d.setDate(d.getDate()-1); return d; }
-const holidayCache={};
-function holidayMap(year){
-  const H={};
-  const add=(dt,label,observe=true)=>{
-    const k=dstr(dt.getFullYear(),dt.getMonth()+1,dt.getDate()); H[k]=label;
-    if(observe){
-      const wd=dt.getDay();
-      if(wd===6){ const o=new Date(dt); o.setDate(o.getDate()-1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
-      if(wd===0){ const o=new Date(dt); o.setDate(o.getDate()+1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
-    }
-  };
-
-  add(new Date(year,0,1),"New Year’s Day");
-  const mlk = nthWeekday(year,1,1,3); if(mlk) H[dstr(mlk.getFullYear(),mlk.getMonth()+1,mlk.getDate())]="MLK Day";
-  const pres = nthWeekday(year,2,1,3); if(pres) H[dstr(pres.getFullYear(),pres.getMonth()+1,pres.getDate())]="Presidents Day";
-  const mem = lastWeekday(year,5,1); if(mem) H[dstr(mem.getFullYear(),mem.getMonth()+1,mem.getDate())]="Memorial Day";
-  add(new Date(year,5,19),"Juneteenth");
-  add(new Date(year,6,4),"Independence Day");
-  const labor = nthWeekday(year,9,1,1); if(labor) H[dstr(labor.getFullYear(),labor.getMonth()+1,labor.getDate())]="Labor Day";
-  const col = nthWeekday(year,10,1,2); if(col) H[dstr(col.getFullYear(),col.getMonth()+1,col.getDate())]="Columbus Day";
-  add(new Date(year,10,11),"Veterans Day");
-  const thx = nthWeekday(year,11,4,4); if(thx) H[dstr(thx.getFullYear(),thx.getMonth()+1,thx.getDate())]="Thanksgiving";
-  if(thx){ const bf = new Date(thx); bf.setDate(bf.getDate()+1); H[dstr(bf.getFullYear(),bf.getMonth()+1,bf.getDate())]="Black Friday"; }
-  H[dstr(year,12,24)]="Christmas Eve";
-  add(new Date(year,11,25),"Christmas Day");
-  H[dstr(year,12,31)]="New Year’s Eve";
-  const eas = easter(year); H[dstr(eas.getFullYear(),eas.getMonth()+1,eas.getDate())]="Easter";
-  const gf = new Date(eas); gf.setDate(gf.getDate()-2); H[dstr(gf.getFullYear(),gf.getMonth()+1,gf.getDate())]="Good Friday";
-  return H;
-}
-function getHolidays(y){ if(!holidayCache[y]) holidayCache[y]=holidayMap(y); return holidayCache[y]; }
-
-/* ---------- GLOBAL STATE ---------- */
-/* Optional CSV paste area: put your CSV lines between the backticks. */
-const PASTED_TASK_CSV = ``;
-
-/* Parse CSV into palette objects */
-function parsePaletteCSV(text){
-  if(!text) return [];
-  const lines = text.replace(/\r/g,"").split("\n").filter(l=>l.trim().length>0);
-  let start = 0;
-  if(/^\s*title\s*,\s*bg\s*,\s*font\s*$/i.test(lines[0].trim())) start = 1;
-  const out=[];
-  for(let i=start;i<lines.length;i++){
-    const row = lines[i];
-    const cells = row.match(/"((?:[^"]|"")*)"|[^,]+/g)?.map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"'))||[];
-    const [title,bg,font] = [cells[0]?.trim(), cells[1]?.trim(), cells[2]?.trim()];
-    if(!title) continue;
-    out.push({title, bg:bg||"#ffffff", font:font||"#000000"});
-  }
-  return out;
-}
-
-let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
+// ---------- State ----------
+let state = JSON.parse(localStorage.getItem("outagePlanner_v34") || "null") || {
   palette: [
     {title:"PGI C", bg:"#B1A0C7", font:"#FF0000"},
     {title:"BC REWORK S/S/C", bg:"#B7DEE4", font:"#FF0004"},
@@ -444,10 +263,12 @@ let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
     {title:"WSW PULLDOWN S/S/C", bg:"#B1A0C3", font:"#FF0004"},
     {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
     {title:"PGI C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
     {title:"BC 3 RUN", bg:"#B7DEE4", font:"#000000"},
     {title:"APEX 5 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
     {title:"3 ROLL C", bg:"#FF0000", font:"#000000"},
     {title:"BF2 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM C", bg:"#B1A0C3", font:"#FF0004"},
     {title:"APEX 6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
     {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
     {title:"BC8 RUN", bg:"#B7DEE4", font:"#000000"},
@@ -456,569 +277,77 @@ let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
     {title:"BC 9 RUN", bg:"#B7DEE4", font:"#000000"},
     {title:"FF 5/6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
     {title:"BF3 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"JOHNSTONE C", bg:"#B1A0C3", font:"#FF0004"},
     {title:"QUAD S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"PGI RUN", bg:"#B1A0C3", font:"#000000"},
     {title:"BC 10 RUN", bg:"#B7DEE4", font:"#000000"},
     {title:"FF 7/9 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
     {title:"BF6 C", bg:"#B7DEE4", font:"#FF0004"},
     {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
     {title:"QUINT S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"3 ROLL RUN", bg:"#FF0000", font:"#000000"},
     {title:"BC REWORK RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"TL2 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
     {title:"VMI 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
     {title:"APEX 1 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"TL5 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
     {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM RUN", bg:"#B1A0C3", font:"#000000"},
     {title:"FISCHER 1 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"WSW C", bg:"#B1A0C3", font:"#FF0004"},
     {title:"VMI 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
     {title:"APEX 3 C", bg:"#B7DEE4", font:"#FF0004"},
     {title:"RECOUP S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"JOHNSTONE RUN", bg:"#B1A0C3", font:"#000000"},
     {title:"FISCHER 2 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"}
+    {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"Gas Cementers", bg:"#FF0000", font:"#000000"},
+    {title:"Purge Gas From Cementers", bg:"#FF0000", font:"#000000"},
+    {title:"VMI REWORK S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 4 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"PGI S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"WSW PULLDOWN RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"QUAD RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"QUINT C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"BC 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 5 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"3 ROLL S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"TL2 C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"BC 8 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"APEX 6 C", bg:"#B7DEE4", font:"#FF0004"},
+    {title:"GUM S/S/C", bg:"#B1A0C3", font:"#FF0004"},
+    {title:"WSW RUN", bg:"#B1A0C3", font:"#000000"},
+    {title:"BF2 RUN", bg:"#B7DEE4", font:"#000000"},
+    {title:"TL5 C", bg:"#B1A0C3", font:"#FF0004"}
   ],
-  months: {}, // "YYYY-MM": { "YYYY-MM-DD": {AM:[], PM:[], EXTRA:[] } }
-  year: new Date().getFullYear(),
-  month: new Date().getMonth()+1,
-  filter: { mode:"all", custom:"" }
+  months: {}, // key "YYYY-MM" : { "YYYY-MM-DD": { AM:[], PM:[], EXTRA:[] } }
+  year: 2025,
+  month: 10,                 // October (1-based: Jan=1 ... Dec=12)
+  filter: { mode: "all", custom: "" }  // required by passesFilter()
 };
 
-/* ---------- ensure palette (CSV overrides default) ---------- */
-(function ensurePalette(){
-  const fromCSV = parsePaletteCSV(PASTED_TASK_CSV);
-  if(fromCSV.length) state.palette = fromCSV;
-})();
 
-/* ---------- month storage helpers ---------- */
-function ensureMonth(y,m){
-  const k=keyFor(y,m);
-  if(!state.months[k]) state.months[k]={};
+
+// ---------- Helpers ----------
+function pad(n){ return String(n).padStart(2,"0"); }
+function keyFor(y,m){ return `${y}-${pad(m)}`; }
+function dstr(y,m,day){ return `${y}-${pad(m)}-${pad(day)}`; }
+function isWeekend(d){ const w=d.getDay(); return w===0 || w===6; } // Sun/Sat
+function prevBusiness(d){
+  let x=new Date(d); x.setDate(x.getDate()-1);
+  while(isWeekend(x)) x.setDate(x.getDate()-1);
+  return x;
+}
+function ensureMonth(state,y,m){
+  const k = keyFor(y,m);
+  if(!state.months[k]) state.months[k] = {};
   return k;
 }
-
-/* ---------- FILTERS ---------- */
-function passesFilter(item){
-  const m=state.filter.mode, c=(state.filter.custom||"").trim().toLowerCase();
-  if(m==="all") return true;
-  if(m==="preventive") return /prev(?!\w)|preventive/i.test(item.title);
-  if(m==="run") return /\brun\b/i.test(item.title);
-  if(m==="custom"){
-    if(!c) return true;
-    if(c.startsWith("#")) return (item.bg||"").toLowerCase()===c || (item.font||"").toLowerCase()===c;
-    return item.title.toLowerCase().includes(c);
-  }
-  return true;
-}
-
-/* ---------- RENDER: Month ---------- */
-function renderMonth(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const H=getHolidays(y), start=new Date(y,m-1,1), end=new Date(y,m,0);
-  const k=ensureMonth(y,m);
-  const container=$("#monthView"); container.innerHTML="";
-
-  const head=el("div",{className:"weekdays"});
-  WEEKDAYS.forEach(w=>head.append(el("div",{textContent:w,className:"badge"})));
-  container.append(head);
-
-  const grid=el("div",{className:"weekgrid"});
-  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
-    const wd=d.getDay(); if(wd===0||wd===6) continue;
-    const ds=dstr(y,m,d.getDate());
-    const day=el("div",{className:"day"});
-    day.append(el("div",{className:"date",textContent:d.toLocaleDateString(undefined,{month:"short",day:"numeric"})}));
-    if(H[ds]) day.append(el("div",{className:"holabel",textContent:H[ds]}));
-
-    const mkSlot=(slotLabel)=>{
-      const slot=el("div",{className:"slot"});
-      slot.append(el("div",{className:"slot-title",textContent:slotLabel}));
-      const dz=el("div",{className:"dropzone"}); dz.dataset.ds=ds; dz.dataset.slot=slotLabel; 
-      dz.addEventListener("dragover",e=>e.preventDefault());
-      dz.addEventListener("drop", onDropFromPalette);
-      slot.append(dz);
-
-      const rec = state.months[k][ds] || {AM:[],PM:[],EXTRA:[]};
-      const arr = slotLabel==="AM"?rec.AM:rec.PM;
-      arr.filter(passesFilter).forEach(item=> dz.append(renderEntry(ds,slotLabel,item)));
-      return slot;
-    };
-    day.append(mkSlot("AM"), mkSlot("PM"));
-    grid.append(day);
-  }
-  container.append(grid);
-
-  setActiveView("month");
-}
-
-/* ---------- RENDER: Week (first week of selected month) ---------- */
-function renderWeek(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const today=new Date(y,m-1,1);
-  const start=new Date(today);
-  start.setDate(1 + ((1 - start.getDay() + 7) % 7)); // first Monday
-  const days=[0,1,2,3,4].map(i=>{ const d=new Date(start); d.setDate(start.getDate()+i); return d; });
-
-  const k=ensureMonth(y,m), H=getHolidays(y);
-  const wrap=$("#weekView"); wrap.innerHTML="";
-  const head=el("div",{className:"weekdays"});
-  WEEKDAYS.forEach(w=>head.append(el("div",{textContent:w,className:"badge"})));
-  wrap.append(head);
-
-  const row=el("div",{className:"weekgrid"});
-  days.forEach(d=>{
-    if(d.getMonth()!==m-1) return;
-    const ds=dstr(d.getFullYear(),d.getMonth()+1,d.getDate());
-    const day=el("div",{className:"day"});
-    day.append(el("div",{className:"date",textContent:d.toLocaleDateString(undefined,{month:"short",day:"numeric"})}));
-    if(H[ds]) day.append(el("div",{className:"holabel",textContent:H[ds]}));
-    const rec=state.months[k][ds]||{AM:[],PM:[],EXTRA:[]};
-    ["AM","PM"].forEach(sl=>{
-      const slot=el("div",{className:"slot"});
-      slot.append(el("div",{className:"slot-title",textContent:sl}));
-      const dz=el("div",{className:"dropzone"}); dz.dataset.ds=ds; dz.dataset.slot=sl;
-      dz.addEventListener("dragover",e=>e.preventDefault());
-      dz.addEventListener("drop", onDropFromPalette);
-      rec[sl].filter(passesFilter).forEach(it=>dz.append(renderEntry(ds,sl,it)));
-      slot.append(dz); day.append(slot);
-    });
-    row.append(day);
-  });
-  wrap.append(row);
-  setActiveView("week");
-}
-
-/* ---------- RENDER: Year ---------- */
-function renderYear(){
-  const y=+$("#yearSel").value;
-  const wrap=$("#yearView"); wrap.innerHTML="";
-  const grid=el("div",{style:"display:grid;grid-template-columns:repeat(3,1fr);gap:8px"});
-  for(let m=1;m<=12;m++){
-    const k=ensureMonth(y,m);
-    const box=el("div",{className:"card"});
-    const count = Object.values(state.months[k]).reduce((acc,rec)=>acc + (rec.AM?.filter(passesFilter).length||0) + (rec.PM?.filter(passesFilter).length||0),0);
-    const head=el("div",{style:"display:flex;justify-content:space-between;align-items:center"});
-    head.append(el("strong",{textContent:MONTHS[m-1]}), el("span",{className:"badge",textContent:count+" items"}));
-    const btn=el("button",{textContent:"Open",style:"margin-top:6px"});
-    btn.addEventListener("click",()=>{ $("#monthSel").value=String(m); state.month=m; save(); renderMonth(); });
-    box.append(head,btn);
-    grid.append(box);
-  }
-  wrap.append(grid);
-  setActiveView("year");
-}
-
-/* ---------- RENDER: Table ---------- */
-function renderTable(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const k=ensureMonth(y,m), body=$("#tableBody"); body.innerHTML="";
-  const days=Object.keys(state.months[k]).sort();
-  for(const ds of days){
-    const rec=state.months[k][ds]; if(!rec) continue;
-    [["AM",rec.AM],["PM",rec.PM]].forEach(([slot,arr])=>{
-      arr.filter(passesFilter).forEach(it=>{
-        const tr=el("tr");
-        tr.append(
-          el("td",{textContent:ds}),
-          el("td",{textContent:slot}),
-          el("td",{textContent:it.title}),
-          el("td",{textContent:it.bg||""}),
-          el("td",{textContent:it.font||""})
-        );
-        body.append(tr);
-      });
-    });
-  }
-}
-
-/* ---------- entries ---------- */
-function renderEntry(ds,slot,item){
-  const div=el("div",{className:"entry"});
-  div.style.background=item.bg||"#ffffff";
-  div.style.color=(item.font||"#000000");
-  div.draggable=true;
-  div.addEventListener("dragstart", e=>{
-    e.dataTransfer.setData("text/plain", JSON.stringify({type:"move", ds, slot, item}));
-  });
-  const label=el("span",{textContent:item.title});
-  const x=el("span",{className:"x",textContent:"✕"});
-  x.addEventListener("click", ()=>removeEntry(ds,slot,item));
-  div.append(label,x);
-  return div;
-}
-
-function onDropFromPalette(e){
-  e.preventDefault();
-  const data=JSON.parse(e.dataTransfer.getData("text/plain"));
-  const ds=e.currentTarget.dataset.ds;
-  const slot=e.currentTarget.dataset.slot; // AM / PM
-  if(data.type==="palette"){
-    placeItem(ds,slot,{title:data.title,bg:data.bg||"#ffffff",font:data.font||"#000000"},true);
-  }else if(data.type==="move"){
-    removeEntry(data.ds,data.slot,data.item,false);
-    placeItem(ds,slot,data.item,true);
-  }
-}
-
-function removeEntry(ds,slot,item,saveAfter=true){
-  const [y,m] = ds.split("-").map(Number);
-  const k=ensureMonth(y,m);
-  const arr = state.months[k][ds]?.[slot] || [];
-  const idx = arr.findIndex(x=>x.title===item.title && x.bg===item.bg && x.font===item.font);
-  if(idx>-1){ arr.splice(idx,1); if(saveAfter){ save(); refreshActiveView(); } }
-}
-
-function placeItem(ds,slot,item,shiftForHoliday){
-  let [y,m,d]=ds.split("-").map(Number);
-  const H=getHolidays(y);
-  let dateObj=new Date(y,m-1,d);
-  if(shiftForHoliday && H[ds]){
-    let p=prevBusiness(dateObj);
-    while(getHolidays(p.getFullYear())[dstr(p.getFullYear(),p.getMonth()+1,p.getDate())]) p=prevBusiness(p);
-    dateObj=p; y=p.getFullYear(); m=p.getMonth()+1; d=p.getDate();
-  }
-  const nds=dstr(y,m,d), k=ensureMonth(y,m);
-  if(!state.months[k][nds]) state.months[k][nds]={AM:[],PM:[],EXTRA:[]};
-  state.months[k][nds][slot].push(item);
-  save(); refreshActiveView();
-}
-
-/* ---------- Palette UI ---------- */
-let editMode=false;
-function refreshPalette(){
-  const list=$("#paletteList"); list.innerHTML="";
-  const q=($("#paletteSearch").value||"").trim().toLowerCase();
-  const items = state.palette.filter(p=> p.title.toLowerCase().includes(q));
-  items.forEach((p,i)=>{
-    const chip=el("div",{className:"taskchip",draggable:!editMode});
-    const cb=el("div",{className:"colorbox"}); cb.style.background=p.bg||"#fff";
-    const name=el("div",{textContent:p.title,style:"flex:1"});
-    const fg=el("span",{className:"badge",textContent:p.font||"#000000"});
-    chip.append(cb,name,fg);
-    if(!editMode){
-      chip.addEventListener("dragstart", e=>{
-        e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
-      });
-    }else{
-      const editB=el("button",{textContent:"Edit"});
-      editB.addEventListener("click",()=>editPaletteItem(i));
-      const delB=el("button",{textContent:"Delete",className:"danger"});
-      delB.addEventListener("click",()=>{ state.palette.splice(i,1); save(); refreshPalette(); fillRepeatOptions(); });
-      chip.append(editB,delB);
-    }
-    list.append(chip);
-  });
-}
-
-<!doctype html>
-<!-- Outage Planner v3.5 — single-file build (2025-10-10) -->
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Outage Planner v3.5</title>
-
-<!-- ========== LIGHT THEME CSS ========== -->
-<style>
-:root{
-  --bg:#f4f6fb; --card:#ffffff; --ring:#d6d9e0; --text:#0b0f14;
-  --muted:#586173; --accent:#2563eb; --grid:#e5e7eb;
-  --danger:#ef4444; --warning:#f59e0b; --success:#10b981;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial
-}
-.wrap{max-width:1280px;margin:18px auto;padding:0 16px}
-h1{margin:0 0 8px;font-size:24px}
-small.muted{color:var(--muted)}
-hr.sep{border:none;border-top:1px solid var(--ring);margin:10px 0}
-
-.card{
-  background:var(--card);border:1px solid var(--ring);border-radius:14px;
-  padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.05)
-}
-button{
-  background:#eef2ff;color:#0b0f14;border:1px solid var(--ring);
-  border-radius:10px;padding:8px 10px;cursor:pointer;white-space:nowrap
-}
-button.primary{background:var(--accent);border-color:transparent;color:#fff}
-button.ghost{background:transparent}
-button.warn{background:#fff7ed;border-color:#fdba74}
-button.danger{background:#fee2e2;border-color:#fecaca}
-button[disabled]{opacity:.5;cursor:not-allowed}
-select,input[type="text"],textarea{
-  background:#fff;border:1px solid var(--ring);color:var(--text);
-  border-radius:8px;padding:6px 8px;width:100%
-}
-label > small{display:block;margin-bottom:4px}
-textarea{width:100%;min-height:180px}
-
-.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
-.viewtabs{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
-.viewtabs button.active{background:var(--accent);border-color:transparent;color:#fff}
-
-.grid{display:grid;grid-template-columns:320px 1fr 260px;gap:12px}
-.leftcol .palette{
-  background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px;
-  max-height:76vh;overflow:auto
-}
-.palette header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap}
-.taskchip{
-  display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;
-  border-left:6px solid var(--accent);background:#fbfdff;border:1px solid var(--ring);
-  margin:6px 0;cursor:grab;color:var(--text)
-}
-.taskchip .colorbox{width:16px;height:16px;border-radius:4px;border:1px solid var(--ring)}
-.badge{display:inline-block;padding:2px 6px;border-radius:999px;border:1px solid var(--ring);font-size:12px;background:#fff}
-.banner{margin:10px 0;padding:8px;border-radius:10px;border:1px solid var(--ring")}
-.info{background:#f6f8ff}
-.error{background:#fff1f2;border-color:#fecdd3;color:#7f1d1d}
-.success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
-
-.calendar,.tablewrap,.yearwrap,.weekwrap{
-  background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:10px
-}
-.weekdays{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:6px}
-.weekgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.day{border:1px solid var(--ring);border-radius:10px;min-height:120px;padding:8px;background:#fff;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.day .date{position:absolute;top:6px;right:8px;font-size:12px;color:#6b7280}
-.day .holabel{position:absolute;top:6px;left:8px;font-size:11px;color:#7a5200;background:#fffbe6;border:1px solid #ffe58f;border-radius:6px;padding:2px 6px}
-.slot{border:1px dashed var(--grid);border-radius:8px;padding:6px;min-height:38px;margin-top:8px;background:#fafcff}
-.slot-title{font-size:11px;color:#6b7280}
-.dropzone{min-height:24px}
-.entry{
-  margin-top:4px;padding:4px 8px;border-radius:8px;border-left:5px solid var(--accent);
-  background:#fff !important;color:#000 !important;display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--ring);box-shadow:0 1px 3px rgba(0,0,0,.06);font-weight:600
-}
-.entry .x{cursor:pointer;font-weight:bold;color:#334155}
-.entry[style*="#ff0000"]{color:#fff !important} /* improve contrast for pure red */
-
-.tablewrap table{width:100%;border-collapse:collapse;background:#fff}
-.tablewrap thead th{font-size:12px;color:#475569;text-align:left;border-bottom:1px solid var(--ring);padding:8px;background:#f7f8fb}
-.tablewrap tbody td{padding:8px;border-bottom:1px dashed var(--grid);color:#0b0f14}
-
-.controls-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.controls-row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-summary{cursor:pointer}
-
-.rightcol .group{margin-bottom:10px}
-.rightcol .group h4{margin:0 0 6px;font-size:13px;color:#334155}
-.rightcol .stack{display:flex;flex-wrap:wrap;gap:8px}
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
-.modal .inner{background:#fff;border:1px solid var(--ring);border-radius:12px;max-width:760px;width:100%;padding:12px;color:#0b0f14}
-.modal footer{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-kbd{background:#f3f4f6;border:1px solid #e5e7eb;border-bottom-color:#d1d5db;border-radius:6px;padding:0 6px}
-.hidden{display:none !important}
-</style>
-</head>
-
-<body>
-<div class="wrap">
-  <h1>Outage Planner</h1>
-
-  <div class="toolbar">
-    <!-- Left control card -->
-    <div class="card">
-      <div class="controls-row">
-        <div>
-          <label><small class="muted">Year</small></label>
-          <select id="yearSel"></select>
-        </div>
-        <div>
-          <label><small class="muted">Month</small></label>
-          <select id="monthSel"></select>
-        </div>
-      </div>
-
-      <div class="viewtabs">
-        <button id="tabMonth" class="active">Month View</button>
-        <button id="tabWeek">Week View</button>
-        <button id="tabYear">Year View</button>
-        <button id="tabTable">Table View</button>
-      </div>
-
-      <div class="banner info">
-        <small class="muted">
-          Drag from palette or move existing entries. Weekends are excluded.
-          Holidays are labeled in <b>yellow</b>. Items dropped on a holiday shift to the <b>previous business day</b>.
-          >2 items spill into an <b>EXTRA</b> stack. Empty weekdays export as <b>gray</b>.
-        </small>
-      </div>
-    </div>
-
-    <!-- Right control card (quick actions / messages) -->
-    <div class="card">
-      <label><small class="muted">Quick Messages</small></label>
-      <div id="msg" class="banner error hidden"></div>
-      <div id="ok" class="banner success hidden"></div>
-      <small class="muted">Tip: Clear cache for testing: <kbd>localStorage.removeItem('outagePlanner_v34')</kbd>. Reload with <kbd>Ctrl</kbd>+<kbd>F5</kbd>.</small>
-    </div>
-  </div>
-
-  <div class="grid">
-    <!-- LEFT: PALETTE -->
-    <div class="leftcol">
-      <div class="palette">
-        <header>
-          <strong>Task Palette</strong>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button id="btnAdd">+ Add Task</button>
-            <button id="btnEditPalette" class="ghost" aria-pressed="false">Edit Tasks</button>
-          </div>
-        </header>
-
-        <div class="controls-row">
-          <div>
-            <label><small class="muted">Search tasks…</small></label>
-            <input id="paletteSearch" type="text" placeholder="Type to filter"/>
-          </div>
-          <div>
-            <label><small class="muted">Repeat — Apply to current month</small></label>
-            <div class="controls-row">
-              <select id="repeatPattern">
-                <option value="wkday">Every Weekday (Mon–Fri)</option>
-                <option value="mon">Every Monday</option>
-                <option value="tue">Every Tuesday</option>
-                <option value="wed">Every Wednesday</option>
-                <option value="thu">Every Thursday</option>
-                <option value="fri">Every Friday</option>
-                <option value="1mon">1st Monday</option><option value="2mon">2nd Monday</option><option value="3mon">3rd Monday</option><option value="4mon">4th Monday</option><option value="lmon">Last Monday</option>
-                <option value="1tue">1st Tuesday</option><option value="2tue">2nd Tuesday</option><option value="3tue">3rd Tuesday</option><option value="4tue">4th Tuesday</option><option value="ltue">Last Tuesday</option>
-                <option value="1wed">1st Wednesday</option><option value="2wed">2nd Wednesday</option><option value="3wed">3rd Wednesday</option><option value="4wed">4th Wednesday</option><option value="lwed">Last Wednesday</option>
-                <option value="1thu">1st Thursday</option><option value="2thu">2nd Thursday</option><option value="3thu">3rd Thursday</option><option value="4thu">4th Thursday</option><option value="lthu">Last Thursday</option>
-                <option value="1fri">1st Friday</option><option value="2fri">2nd Friday</option><option value="3fri">3rd Friday</option><option value="4fri">4th Friday</option><option value="lfri">Last Friday</option>
-              </select>
-              <select id="repeatSlot"><option>AM</option><option>PM</option></select>
-            </div>
-          </div>
-        </div>
-        <div class="controls-row">
-          <div>
-            <label><small class="muted">Task to repeat</small></label>
-            <select id="repeatTask"></select>
-          </div>
-          <div style="align-self:end">
-            <button id="btnApplyRepeat" class="primary" style="width:100%">Apply</button>
-          </div>
-        </div>
-
-        <hr class="sep"/>
-
-        <div id="paletteList"></div>
-      </div>
-    </div>
-
-    <!-- CENTER: VIEWS -->
-    <div class="centercol">
-      <div id="monthView" class="calendar"></div>
-      <div id="weekView" class="weekwrap hidden"></div>
-      <div id="yearView" class="yearwrap hidden"></div>
-      <div id="tableView" class="tablewrap hidden">
-        <table>
-          <thead>
-            <tr><th>Date</th><th>Slot</th><th>Title</th><th>BG</th><th>Font</th></tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- RIGHT: TOOLS -->
-    <div class="rightcol">
-      <div class="card group">
-        <h4>Scheduling</h4>
-        <div class="stack">
-          <button id="btnCopyMonth">Copy to All Months</button>
-          <button id="btnCopyYears">Copy to Other Years</button>
-        </div>
-      </div>
-
-      <div class="card group">
-        <h4>Data</h4>
-        <div class="stack">
-          <button id="btnBackup" title="Save full state as .json">Back Up Schedule</button>
-          <input id="restoreFile" type="file" accept=".json" class="hidden" />
-          <button id="btnRestore">Restore Schedule</button>
-        </div>
-      </div>
-
-      <div class="card group">
-        <h4>Share & Print</h4>
-        <div class="stack">
-          <button id="btnPrintMonth">Print Month</button>
-          <button id="btnShareHtml">Share as HTML</button>
-          <button id="btnExportCSV">Export to Spreadsheet</button>
-          <input id="importFile" type="file" accept=".csv" class="hidden"/>
-          <button id="btnImportCSV">Import Spreadsheet</button>
-        </div>
-      </div>
-
-      <div class="card group">
-        <h4>Filters</h4>
-        <div class="stack">
-          <button id="fltAll" class="primary">Show All</button>
-          <button id="fltPreventive">Only Preventive</button>
-          <button id="fltRun">Only Run</button>
-          <button id="fltCustom" title="Filter by color hex or text">Custom…</button>
-        </div>
-      </div>
-
-      <div class="card group">
-        <h4>Cleanup</h4>
-        <div class="stack">
-          <button id="btnClearMonth" class="warn">Clear This Month</button>
-          <button id="btnResetAll" class="danger">Reset Everything</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ======= MODALS ======= -->
-<div id="modalPrompt" class="modal" role="dialog" aria-modal="true">
-  <div class="inner">
-    <h3 id="modalTitle">Confirm</h3>
-    <p id="modalText"></p>
-    <footer>
-      <button id="modalCancel">Cancel</button>
-      <button id="modalOk" class="primary">OK</button>
-    </footer>
-  </div>
-</div>
-
-<div id="modalCustom" class="modal" role="dialog" aria-modal="true">
-  <div class="inner">
-    <h3>Custom Filter</h3>
-    <p><small class="muted">Enter a keyword (in title) or a hex color (bg or font), e.g. <kbd>RUN</kbd> or <kbd>#ff0000</kbd>.</small></p>
-    <input id="customFilterInput" type="text" placeholder="RUN or #ff0000"/>
-    <footer>
-      <button id="customCancel">Cancel</button>
-      <button id="customApply" class="primary">Apply</button>
-    </footer>
-  </div>
-</div>
-
-<!-- ========== APP LOGIC ========== -->
-<script>
-/* ---------- tiny helpers ---------- */
-const $ = sel => document.querySelector(sel);
-const $$ = sel => Array.from(document.querySelectorAll(sel));
-const el = (t,props={}) => Object.assign(document.createElement(t),props);
-const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const WEEKDAYS = ["Mon","Tue","Wed","Thu","Fri"];
-const pad = n => String(n).padStart(2,"0");
-const dstr = (y,m,d)=>`${y}-${pad(m)}-${pad(d)}`;
-const keyFor = (y,m)=>`${y}-${pad(m)}`;
-const isWeekend = d => (d.getDay()===0||d.getDay()===6);
-const show = (n,yes)=> n.classList[yes?"remove":"add"]("hidden");
-const msg = t => { const n=$("#msg"); n.textContent=t; show(n,true); setTimeout(()=>show(n,false),3000); };
-const ok  = t => { const n=$("#ok"); n.textContent=t; show(n,true); setTimeout(()=>show(n,false),2500); };
-const download = (name,text,mime="text/plain;charset=utf-8")=>{
-  const a=el("a",{href:`data:${mime},`+encodeURIComponent(text),download:name}); document.body.append(a); a.click(); a.remove();
-};
+function msg(t){ const n=$("#msg"); n.textContent=t; n.style.display="block"; setTimeout(()=>n.style.display="none",3000); }
 function save(){ localStorage.setItem("outagePlanner_v34", JSON.stringify(state)); }
 
-/* ---------- holidays ---------- */
-function prevBusiness(d){ let x=new Date(d); x.setDate(x.getDate()-1); while(isWeekend(x)) x.setDate(x.getDate()-1); return x; }
+// ---------- Holidays ----------
 function easter(year){
   const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4);
   const e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
@@ -1028,221 +357,85 @@ function easter(year){
   const day=((h+l-7*m+114)%31)+1;
   return new Date(year, month-1, day);
 }
-function nthWeekday(year,month,weekday,n){ const d=new Date(year,month-1,1); let c=0; while(d.getMonth()===month-1){ if(d.getDay()===weekday){ c++; if(c===n) return new Date(d);} d.setDate(d.getDate()+1);} return null; }
-function lastWeekday(year,month,weekday){ const d=new Date(year,month,0); while(d.getDay()!==weekday) d.setDate(d.getDate()-1); return d; }
-const holidayCache={};
+function nthWeekday(year,month,weekday,n){
+  const d=new Date(year,month-1,1); let count=0;
+  while(d.getMonth()===month-1){ if(d.getDay()===weekday){ count++; if(count===n) return new Date(d); } d.setDate(d.getDate()+1); }
+  return null;
+}
+function lastWeekday(year,month,weekday){
+  const d=new Date(year,month,0); // last day of month
+  while(d.getDay()!==weekday) d.setDate(d.getDate()-1);
+  return d;
+}
 function holidayMap(year){
-  const H={};
-  const add=(dt,label,observe=true)=>{
-    const k=dstr(dt.getFullYear(),dt.getMonth()+1,dt.getDate()); H[k]=label;
+  const H={}; const add=(dt, label, observe=true)=>{
+    const k=dstr(dt.getFullYear(), dt.getMonth()+1, dt.getDate()); H[k]=label;
     if(observe){
       const wd=dt.getDay();
       if(wd===6){ const o=new Date(dt); o.setDate(o.getDate()-1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
       if(wd===0){ const o=new Date(dt); o.setDate(o.getDate()+1); H[dstr(o.getFullYear(),o.getMonth()+1,o.getDate())]=label+" (observed)"; }
     }
   };
-
   add(new Date(year,0,1),"New Year’s Day");
-  const mlk = nthWeekday(year,1,1,3); if(mlk) H[dstr(mlk.getFullYear(),mlk.getMonth()+1,mlk.getDate())]="MLK Day";
-  const pres = nthWeekday(year,2,1,3); if(pres) H[dstr(pres.getFullYear(),pres.getMonth()+1,pres.getDate())]="Presidents Day";
-  const mem = lastWeekday(year,5,1); if(mem) H[dstr(mem.getFullYear(),mem.getMonth()+1,mem.getDate())]="Memorial Day";
+  H[dstr(year,0+1, nthWeekday(year,1,1,3).getDate())] = "MLK Day";               // 3rd Mon Jan (no observed)
+  H[dstr(year,1+1, nthWeekday(year,2,1,3).getDate())] = "Presidents Day";       // 3rd Mon Feb
+  H[dstr(year,4+1, lastWeekday(year,5,1).getDate())]  = "Memorial Day";         // last Mon May
   add(new Date(year,5,19),"Juneteenth");
   add(new Date(year,6,4),"Independence Day");
-  const labor = nthWeekday(year,9,1,1); if(labor) H[dstr(labor.getFullYear(),labor.getMonth()+1,labor.getDate())]="Labor Day";
-  const col = nthWeekday(year,10,1,2); if(col) H[dstr(col.getFullYear(),col.getMonth()+1,col.getDate())]="Columbus Day";
+  H[dstr(year,8, nthWeekday(year,9,1,1).getDate())]   = "Labor Day";            // 1st Mon Sep
+  H[dstr(year,9, nthWeekday(year,10,1,2).getDate())]  = "Columbus Day";         // 2nd Mon Oct
   add(new Date(year,10,11),"Veterans Day");
-  const thx = nthWeekday(year,11,4,4); if(thx) H[dstr(thx.getFullYear(),thx.getMonth()+1,thx.getDate())]="Thanksgiving";
-  if(thx){ const bf = new Date(thx); bf.setDate(bf.getDate()+1); H[dstr(bf.getFullYear(),bf.getMonth()+1,bf.getDate())]="Black Friday"; }
-  H[dstr(year,12,24)]="Christmas Eve";
-  add(new Date(year,11,25),"Christmas Day");
-  H[dstr(year,12,31)]="New Year’s Eve";
-  const eas = easter(year); H[dstr(eas.getFullYear(),eas.getMonth()+1,eas.getDate())]="Easter";
-  const gf = new Date(eas); gf.setDate(gf.getDate()-2); H[dstr(gf.getFullYear(),gf.getMonth()+1,gf.getDate())]="Good Friday";
+  const thx = nthWeekday(year,11,4,4); H[dstr(thx.getFullYear(),12,thx.getDate())]="Thanksgiving";
+  const bf = new Date(thx); bf.setDate(bf.getDate()+1); H[dstr(bf.getFullYear(),12,bf.getDate())]="Black Friday";
+  H[dstr(year,11,24)]="Christmas Eve"; add(new Date(year,11,25),"Christmas Day"); H[dstr(year,11,31)]="New Year’s Eve";
+  const eas = easter(year); H[dstr(eas.getFullYear(), eas.getMonth()+1, eas.getDate())] = "Easter";
+  const gf = new Date(eas); gf.setDate(gf.getDate()-2); H[dstr(gf.getFullYear(), gf.getMonth()+1, gf.getDate())] = "Good Friday";
   return H;
 }
+const holidayCache = {};
 function getHolidays(y){ if(!holidayCache[y]) holidayCache[y]=holidayMap(y); return holidayCache[y]; }
 
-/* ---------- GLOBAL STATE ---------- */
-/* Optional CSV paste area: put your CSV lines between the backticks. */
-const PASTED_TASK_CSV = ``;
-
-/* Parse CSV into palette objects */
-function parsePaletteCSV(text){
-  if(!text) return [];
-  const lines = text.replace(/\r/g,"").split("\n").filter(l=>l.trim().length>0);
-  let start = 0;
-  if(/^\s*title\s*,\s*bg\s*,\s*font\s*$/i.test(lines[0].trim())) start = 1;
-  const out=[];
-  for(let i=start;i<lines.length;i++){
-    const row = lines[i];
-    const cells = row.match(/"((?:[^"]|"")*)"|[^,]+/g)?.map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"'))||[];
-    const [title,bg,font] = [cells[0]?.trim(), cells[1]?.trim(), cells[2]?.trim()];
-    if(!title) continue;
-    out.push({title, bg:bg||"#ffffff", font:font||"#000000"});
-  }
-  return out;
-}
-
-let state = JSON.parse(localStorage.getItem("outagePlanner_v34")||"null") || {
-  palette: [
-    {title:"PGI C", bg:"#B1A0C7", font:"#FF0000"},
-    {title:"BC REWORK S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"VMI 1 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"3 ROLL C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"APEX 1 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"FISCHER 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"VMI 2 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"GUM C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"APEX 2 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"WSW S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"FISCHER 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"VMI 3 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"JOHNSTONE C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"RECOUP RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"APEX 3 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"QUAD S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"VMI REWORK C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"PGI RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"APEX 4 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"QUINT S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"BC 3 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"TL2 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"3 ROLL RUN", bg:"#FF0000", font:"#000000"},
-    {title:"APEX 5 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"GUM RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"APEX 6 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"BC 8 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"BF2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"TL5 S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"WSW C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"JOHNSTONE RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"FF 5/6 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"BC 9 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"BF3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"RECOUP S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"FF 7/9 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"BC 10 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"BF6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"PGI S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"QUINT C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"VMI 1 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"APEX 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"TL2 C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"TL3 C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"WSW RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"VMI 2 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"FISCHER 1 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"APEX 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"GUM S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"TL5 C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"QUAD RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"VMI 3 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"FISCHER 2 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"APEX 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"JOHNSTONE S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"RECOUP C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"QUINT RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"VMI REWORK RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"APEX 4 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"WSW PULLDOWN S/S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"TL2 RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"PGI C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"BC 3 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"APEX 5 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"3 ROLL C", bg:"#FF0000", font:"#000000"},
-    {title:"BF2 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"APEX 6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"TL5 RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"BC8 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"WSW S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"RECOUP RUN", bg:"#B1A0C3", font:"#000000"},
-    {title:"BC 9 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"FF 5/6 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"BF3 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"QUAD S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"BC 10 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"FF 7/9 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"BF6 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"WSW PULLDOWN C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"QUINT S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"BC REWORK RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"VMI 1 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"APEX 1 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"VMI 2 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"FISCHER 1 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"VMI 3 S/S/C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"APEX 3 C", bg:"#B7DEE4", font:"#FF0004"},
-    {title:"RECOUP S/C", bg:"#B1A0C3", font:"#FF0004"},
-    {title:"FISCHER 2 RUN", bg:"#B7DEE4", font:"#000000"},
-    {title:"QUAD C", bg:"#B1A0C3", font:"#FF0004"}
-  ],
-  months: {}, // "YYYY-MM": { "YYYY-MM-DD": {AM:[], PM:[], EXTRA:[] } }
-  year: new Date().getFullYear(),
-  month: new Date().getMonth()+1,
-  filter: { mode:"all", custom:"" }
-};
-
-/* ---------- ensure palette (CSV overrides default) ---------- */
-(function ensurePalette(){
-  const fromCSV = parsePaletteCSV(PASTED_TASK_CSV);
-  if(fromCSV.length) state.palette = fromCSV;
-})();
-
-/* ---------- month storage helpers ---------- */
-function ensureMonth(y,m){
-  const k=keyFor(y,m);
-  if(!state.months[k]) state.months[k]={};
-  return k;
-}
-
-/* ---------- FILTERS ---------- */
-function passesFilter(item){
-  const m=state.filter.mode, c=(state.filter.custom||"").trim().toLowerCase();
-  if(m==="all") return true;
-  if(m==="preventive") return /prev(?!\w)|preventive/i.test(item.title);
-  if(m==="run") return /\brun\b/i.test(item.title);
-  if(m==="custom"){
-    if(!c) return true;
-    if(c.startsWith("#")) return (item.bg||"").toLowerCase()===c || (item.font||"").toLowerCase()===c;
-    return item.title.toLowerCase().includes(c);
-  }
-  return true;
-}
-
-/* ---------- RENDER: Month ---------- */
+// ---------- Rendering ----------
 function renderMonth(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const H=getHolidays(y), start=new Date(y,m-1,1), end=new Date(y,m,0);
-  const k=ensureMonth(y,m);
-  const container=$("#monthView"); container.innerHTML="";
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value); // numeric month 1..12
+  const H = getHolidays(y);
+  const start = new Date(y, m-1, 1);
+  const end   = new Date(y, m, 0);
 
-  const head=el("div",{className:"weekdays"});
-  WEEKDAYS.forEach(w=>head.append(el("div",{textContent:w,className:"badge"})));
+  const k = ensureMonth(state,y,m);
+  const container = $("#monthView"); container.innerHTML = "";
+
+  // headings
+  const head = el("div",{className:"weekdays"});
+  WEEKDAYS.forEach(w => head.append(el("div",{textContent:w, className:"badge"})));
   container.append(head);
 
-  const grid=el("div",{className:"weekgrid"});
-  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
-    const wd=d.getDay(); if(wd===0||wd===6) continue;
-    const ds=dstr(y,m,d.getDate());
-    const day=el("div",{className:"day"});
-    day.append(el("div",{className:"date",textContent:d.toLocaleDateString(undefined,{month:"short",day:"numeric"})}));
-    if(H[ds]) day.append(el("div",{className:"holabel",textContent:H[ds]}));
+  const grid = el("div",{className:"weekgrid"});
+  for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+    const wd = d.getDay(); // Sun=0..Sat=6
+    if(wd===0 || wd===6) continue; // skip weekends
+    const ds = dstr(y,m,d.getDate());
+    const day = el("div",{className:"day"});
+    const dateEl = el("div",{className:"date",textContent: d.toLocaleDateString(undefined,{month:"short",day:"numeric"})});
+    day.append(dateEl);
 
-    const mkSlot=(slotLabel)=>{
-      const slot=el("div",{className:"slot"});
-      slot.append(el("div",{className:"slot-title",textContent:slotLabel}));
-      const dz=el("div",{className:"dropzone"}); dz.dataset.ds=ds; dz.dataset.slot=slotLabel; 
-      dz.addEventListener("dragover",e=>e.preventDefault());
+    // holiday label
+    const hol = H[ds];
+    if(hol){ day.append(el("div",{className:"holabel",textContent:hol})); }
+
+    const mkSlot = (slotName)=>{
+      const slot = el("div",{className:"slot"});
+      slot.append(el("div",{className:"slot-title",textContent:slotName}));
+      const dz = el("div",{className:"dropzone"});
+      dz.dataset.ds = ds; dz.dataset.slot = slotName.replace(":","").trim();
+      dz.addEventListener("dragover", e=>e.preventDefault());
       dz.addEventListener("drop", onDropFromPalette);
       slot.append(dz);
 
+      // existing entries
       const rec = state.months[k][ds] || {AM:[],PM:[],EXTRA:[]};
-      const arr = slotLabel==="AM"?rec.AM:rec.PM;
-      arr.filter(passesFilter).forEach(item=> dz.append(renderEntry(ds,slotLabel,item)));
+      const arr = slotName.startsWith("AM") ? rec.AM : rec.PM;
+      arr.forEach(item => dz.append(renderEntry(ds, slotName.startsWith("AM")?"AM":"PM", item)));
       return slot;
     };
     day.append(mkSlot("AM"), mkSlot("PM"));
@@ -1250,306 +443,137 @@ function renderMonth(){
   }
   container.append(grid);
 
-  setActiveView("month");
+  // tab active
+  $("#tabMonth").classList.add("active"); $("#tabTable").classList.remove("active");
+  $("#monthView").style.display="block"; $("#tableView").style.display="none";
 }
 
-/* ---------- RENDER: Week (first week of selected month) ---------- */
-function renderWeek(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const today=new Date(y,m-1,1);
-  const start=new Date(today);
-  start.setDate(1 + ((1 - start.getDay() + 7) % 7)); // first Monday
-  const days=[0,1,2,3,4].map(i=>{ const d=new Date(start); d.setDate(start.getDate()+i); return d; });
-
-  const k=ensureMonth(y,m), H=getHolidays(y);
-  const wrap=$("#weekView"); wrap.innerHTML="";
-  const head=el("div",{className:"weekdays"});
-  WEEKDAYS.forEach(w=>head.append(el("div",{textContent:w,className:"badge"})));
-  wrap.append(head);
-
-  const row=el("div",{className:"weekgrid"});
-  days.forEach(d=>{
-    if(d.getMonth()!==m-1) return;
-    const ds=dstr(d.getFullYear(),d.getMonth()+1,d.getDate());
-    const day=el("div",{className:"day"});
-    day.append(el("div",{className:"date",textContent:d.toLocaleDateString(undefined,{month:"short",day:"numeric"})}));
-    if(H[ds]) day.append(el("div",{className:"holabel",textContent:H[ds]}));
-    const rec=state.months[k][ds]||{AM:[],PM:[],EXTRA:[]};
-    ["AM","PM"].forEach(sl=>{
-      const slot=el("div",{className:"slot"});
-      slot.append(el("div",{className:"slot-title",textContent:sl}));
-      const dz=el("div",{className:"dropzone"}); dz.dataset.ds=ds; dz.dataset.slot=sl;
-      dz.addEventListener("dragover",e=>e.preventDefault());
-      dz.addEventListener("drop", onDropFromPalette);
-      rec[sl].filter(passesFilter).forEach(it=>dz.append(renderEntry(ds,sl,it)));
-      slot.append(dz); day.append(slot);
-    });
-    row.append(day);
+function renderEntry(ds,slot,item){
+  const div = el("div",{className:"entry"});
+  div.style.background = item.bg || "#ffffff";
+  div.style.color = (item.font || "#000000");
+  div.draggable = true;
+  div.addEventListener("dragstart", e=>{
+    e.dataTransfer.setData("text/plain", JSON.stringify({type:"move", ds, slot, item}));
   });
-  wrap.append(row);
-  setActiveView("week");
+  const label = el("span",{textContent:item.title});
+  const x = el("span",{className:"x",textContent:"✕"});
+  x.addEventListener("click", ()=>removeEntry(ds,slot,item));
+  div.append(label,x);
+  return div;
 }
 
-/* ---------- RENDER: Year ---------- */
-function renderYear(){
-  const y=+$("#yearSel").value;
-  const wrap=$("#yearView"); wrap.innerHTML="";
-  const grid=el("div",{style:"display:grid;grid-template-columns:repeat(3,1fr);gap:8px"});
-  for(let m=1;m<=12;m++){
-    const k=ensureMonth(y,m);
-    const box=el("div",{className:"card"});
-    const count = Object.values(state.months[k]).reduce((acc,rec)=>acc + (rec.AM?.filter(passesFilter).length||0) + (rec.PM?.filter(passesFilter).length||0),0);
-    const head=el("div",{style:"display:flex;justify-content:space-between;align-items:center"});
-    head.append(el("strong",{textContent:MONTHS[m-1]}), el("span",{className:"badge",textContent:count+" items"}));
-    const btn=el("button",{textContent:"Open",style:"margin-top:6px"});
-    btn.addEventListener("click",()=>{ $("#monthSel").value=String(m); state.month=m; save(); renderMonth(); });
-    box.append(head,btn);
-    grid.append(box);
-  }
-  wrap.append(grid);
-  setActiveView("year");
-}
-
-/* ---------- RENDER: Table ---------- */
 function renderTable(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const k=ensureMonth(y,m), body=$("#tableBody"); body.innerHTML="";
-  const days=Object.keys(state.months[k]).sort();
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const k = ensureMonth(state,y,m), body = $("#tableBody"); body.innerHTML="";
+  const days = Object.keys(state.months[k]).sort();
   for(const ds of days){
-    const rec=state.months[k][ds]; if(!rec) continue;
+    const rec = state.months[k][ds]; if(!rec) continue;
     [["AM",rec.AM],["PM",rec.PM]].forEach(([slot,arr])=>{
-      arr.filter(passesFilter).forEach(it=>{
-        const tr=el("tr");
-        tr.append(
-          el("td",{textContent:ds}),
-          el("td",{textContent:slot}),
-          el("td",{textContent:it.title}),
-          el("td",{textContent:it.bg||""}),
-          el("td",{textContent:it.font||""})
-        );
+      if(arr.length===0) return;
+      arr.forEach(it=>{
+        const tr = el("tr");
+        tr.append(el("td",{textContent: ds}), el("td",{textContent:slot}),
+                 el("td",{textContent:it.title}), el("td",{textContent:it.bg}), el("td",{textContent:it.font}));
         body.append(tr);
       });
     });
   }
 }
 
-/* ---------- entries ---------- */
-function renderEntry(ds,slot,item){
-  const div=el("div",{className:"entry"});
-  div.style.background=item.bg||"#ffffff";
-  div.style.color=(item.font||"#000000");
-  div.draggable=true;
-  div.addEventListener("dragstart", e=>{
-    e.dataTransfer.setData("text/plain", JSON.stringify({type:"move", ds, slot, item}));
-  });
-  const label=el("span",{textContent:item.title});
-  const x=el("span",{className:"x",textContent:"✕"});
-  x.addEventListener("click", ()=>removeEntry(ds,slot,item));
-  div.append(label,x);
-  return div;
-}
-
-function onDropFromPalette(e){
-  e.preventDefault();
-  const data=JSON.parse(e.dataTransfer.getData("text/plain"));
-  const ds=e.currentTarget.dataset.ds;
-  const slot=e.currentTarget.dataset.slot; // AM / PM
-  if(data.type==="palette"){
-    placeItem(ds,slot,{title:data.title,bg:data.bg||"#ffffff",font:data.font||"#000000"},true);
-  }else if(data.type==="move"){
-    removeEntry(data.ds,data.slot,data.item,false);
-    placeItem(ds,slot,data.item,true);
-  }
-}
-
-function removeEntry(ds,slot,item,saveAfter=true){
-  const [y,m] = ds.split("-").map(Number);
-  const k=ensureMonth(y,m);
-  const arr = state.months[k][ds]?.[slot] || [];
-  const idx = arr.findIndex(x=>x.title===item.title && x.bg===item.bg && x.font===item.font);
-  if(idx>-1){ arr.splice(idx,1); if(saveAfter){ save(); refreshActiveView(); } }
-}
-
-function placeItem(ds,slot,item,shiftForHoliday){
-  let [y,m,d]=ds.split("-").map(Number);
-  const H=getHolidays(y);
-  let dateObj=new Date(y,m-1,d);
-  if(shiftForHoliday && H[ds]){
-    let p=prevBusiness(dateObj);
-    while(getHolidays(p.getFullYear())[dstr(p.getFullYear(),p.getMonth()+1,p.getDate())]) p=prevBusiness(p);
-    dateObj=p; y=p.getFullYear(); m=p.getMonth()+1; d=p.getDate();
-  }
-  const nds=dstr(y,m,d), k=ensureMonth(y,m);
-  if(!state.months[k][nds]) state.months[k][nds]={AM:[],PM:[],EXTRA:[]};
-  state.months[k][nds][slot].push(item);
-  save(); refreshActiveView();
-}
-
-/* ---------- Palette UI ---------- */
-let editMode=false;
+// ---------- Palette ----------
 function refreshPalette(){
-  const list=$("#paletteList"); list.innerHTML="";
-  const q=($("#paletteSearch").value||"").trim().toLowerCase();
-  const items = state.palette.filter(p=> p.title.toLowerCase().includes(q));
-  items.forEach((p,i)=>{
-    const chip=el("div",{className:"taskchip",draggable:!editMode});
-    const cb=el("div",{className:"colorbox"}); cb.style.background=p.bg||"#fff";
-    const name=el("div",{textContent:p.title,style:"flex:1"});
-    const fg=el("span",{className:"badge",textContent:p.font||"#000000"});
-    chip.append(cb,name,fg);
-    if(!editMode){
-      chip.addEventListener("dragstart", e=>{
-        e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
-      });
-    }else{
-      const editB=el("button",{textContent:"Edit"});
-      editB.addEventListener("click",()=>editPaletteItem(i));
-      const delB=el("button",{textContent:"Delete",className:"danger"});
-      delB.addEventListener("click",()=>{ state.palette.splice(i,1); save(); refreshPalette(); fillRepeatOptions(); });
-      chip.append(editB,delB);
-    }
+  const list = $("#paletteList"); list.innerHTML="";
+  state.palette.forEach((p,i)=>{
+    const chip = el("div",{className:"taskchip",draggable:true});
+    const cb = el("div",{className:"colorbox"}); cb.style.background = p.bg || "#fff";
+    const name = el("div",{textContent:p.title});
+    chip.append(cb, name, el("span",{className:"badge",textContent:p.font||"#000000"}));
+    chip.addEventListener("dragstart", e=>{
+      e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
+    });
     list.append(chip);
   });
-}
 
-function editPaletteItem(idx){
-  const cur=state.palette[idx];
-  const title=prompt("Title:",cur.title); if(title===null) return;
-  const bg=prompt("BG hex (e.g. #b1a0c7):",cur.bg||"#ffffff"); if(bg===null) return;
-  const font=prompt("Font hex (e.g. #000000):",cur.font||"#000000"); if(font===null) return;
-  state.palette[idx]={title:title.trim(),bg:bg||cur.bg,font:font||cur.font};
-  save(); refreshPalette(); fillRepeatOptions();
-}
-
-function addPaletteItem(){
-  const title=prompt("New task title:"); if(!title) return;
-  const bg=prompt("BG hex (e.g. #b1a0c7):","#ffffff")||"#ffffff";
-  const font=prompt("Font hex (e.g. #000000):","#000000")||"#000000";
-  state.palette.push({title:title.trim(),bg,font});
-  save(); refreshPalette(); fillRepeatOptions(); ok("Task added.");
-}
-
-function fillRepeatOptions(){
+  // fill repeat combobox
   const sel=$("#repeatTask"); sel.innerHTML="";
-  state.palette.forEach(p=> sel.append(el("option",{textContent:p.title,value:p.title})));
+  state.palette.forEach(p => sel.append(el("option",{textContent:p.title})));
 }
 
-/* ---------- Repeat patterns ---------- */
-function applyRepeat(){
-  const title=$("#repeatTask").value;
-  if(!title){ msg("Choose a task to repeat"); return; }
-  const task = state.palette.find(p=>p.title===title);
-  const slot=$("#repeatSlot").value; const pat=$("#repeatPattern").value;
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const start=new Date(y,m-1,1), end=new Date(y,m,0);
-  const matchers={
-    wkday: d=> d.getDay()>=1 && d.getDay()<=5,
-    mon: d=> d.getDay()===1, tue: d=> d.getDay()===2, wed: d=> d.getDay()===3, thu: d=> d.getDay()===4, fri: d=> d.getDay()===5
-  };
-  function nth(dow,n,last=false){
-    const arr=[]; for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){ if(d.getDay()===dow) arr.push(new Date(d)); }
-    if(last) return [arr[arr.length-1]];
-    return arr[n-1] ? [arr[n-1]] : [];
-  }
-  const pick = (()=>{
-    if(pat==="wkday"||["mon","tue","wed","thu","fri"].includes(pat)) return {type:"dow",val:pat};
-    const mapIdx={mon:1,tue:2,wed:3,thu:4,fri:5};
-    if(/^([1-4])([a-z]{3
-           if(/^([1-4])([a-z]{3})$/.test(pat)){
-      const m2 = pat.match(/^([1-4])([a-z]{3})$/);
-      const n = +m2[1], dw = mapIdx[m2[2]];
-      return {type:"nth", n, dw};
-    }
-    if(/^l([a-z]{3})$/.test(pat)){
-      const m3 = pat.match(/^l([a-z]{3})$/);
-      const dw = mapIdx[m3[1]];
-      return {type:"last", dw};
-    }
-    return {type:"dow", val:"wkday"};
-  })();
+function onDropFromPalette(e){
+  e.preventDefault();
+  const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+  const ds = e.currentTarget.dataset.ds;
+  const slot = e.currentTarget.dataset.slot; // "AM" or "PM"
 
-  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
-    let use=false;
-    if(pick.type==="dow"){
-      if(pick.val==="wkday") use = d.getDay()>=1 && d.getDay()<=5;
-      else use = matchers[pick.val](d);
-    }else if(pick.type==="nth"){
-      const list=(function(dow,n){
-        const arr=[]; for(let x=new Date(start); x<=end; x.setDate(x.getDate()+1)){ if(x.getDay()===dow) arr.push(new Date(x)); }
-        return arr[n-1] ? [arr[n-1]] : [];
-      })(pick.dw,pick.n);
-      use = list.some(x=> x.getDate()===d.getDate());
-    }else if(pick.type==="last"){
-      const list=(function(dow){
-        const arr=[]; for(let x=new Date(start); x<=end; x.setDate(x.getDate()+1)){ if(x.getDay()===dow) arr.push(new Date(x)); }
-        return arr.length? [arr[arr.length-1]] : [];
-      })(pick.dw);
-      use = list.some(x=> x.getDate()===d.getDate());
-    }
-    if(use){
-      const ds=dstr(y,m,d.getDate());
-      placeItem(ds,slot,{title:task.title,bg:task.bg,font:task.font},true);
-    }
+  if(data.type==="palette"){
+    const item = {title:data.title, bg:data.bg||"#ffffff", font:(data.font||"#000000")};
+    placeItem(ds, slot, item, true);
+  }else if(data.type==="move"){
+    // moving an existing card
+    removeEntry(data.ds, data.slot, data.item, false);
+    placeItem(ds, slot, data.item, true);
   }
-  ok("Repeat applied.");
 }
 
-/* ---------- Export / Import / Share ---------- */
+function removeEntry(ds,slot,item, saveAfter=true){
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const k = ensureMonth(state,y,m);
+  const arr = state.months[k][ds]?.[slot] || [];
+  const idx = arr.findIndex(x => x.title===item.title && x.bg===item.bg && x.font===item.font);
+  if(idx>-1){ arr.splice(idx,1); if(saveAfter){ save(); renderMonth(); renderTable(); } }
+}
+
+function placeItem(ds,slot,item, shiftForHoliday){
+  // holiday shift → previous business day
+  const [y,m,d] = ds.split("-").map(n=>Number(n));
+  const H = getHolidays(y);
+  let dateObj = new Date(y, m-1, d);
+  if(shiftForHoliday && H[ds]){
+    let p = prevBusiness(dateObj);
+    while(getHolidays(p.getFullYear())[dstr(p.getFullYear(),p.getMonth()+1,p.getDate())]) p = prevBusiness(p);
+    dateObj = p;
+  }
+  const nds = dstr(dateObj.getFullYear(), dateObj.getMonth()+1, dateObj.getDate());
+  const k = ensureMonth(state, dateObj.getFullYear(), dateObj.getMonth()+1);
+  if(!state.months[k][nds]) state.months[k][nds] = {AM:[],PM:[],EXTRA:[]};
+  state.months[k][nds][slot].push(item);
+  save(); renderMonth(); renderTable();
+}
+
+// ---------- Export / Import ----------
 function exportCSV(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value, k=ensureMonth(y,m);
-  let out="year,month,date,slot,title,bg,font\n";
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const k = ensureMonth(state,y,m);
+  let out = "year,month,date,slot,title,bg,font\n";
   for(const ds of Object.keys(state.months[k]).sort()){
-    const rec=state.months[k][ds]; if(!rec) continue;
+    const rec = state.months[k][ds]; if(!rec) continue;
     [["AM",rec.AM],["PM",rec.PM]].forEach(([slot,arr])=>{
-      if(arr.length===0) out += `${y},${m},${ds},${slot},,,\n`;
-      else arr.forEach(it=> out += `${y},${m},${ds},${slot},${csvEsc(it.title)},${it.bg||""},${it.font||""}\n`);
+      if(arr.length===0){
+        out += `${y},${m},${ds},${slot},,,\n`;
+      }else{
+        arr.forEach(it=> out += `${y},${m},${ds},${slot},${csvEscape(it.title)},${it.bg||""},${it.font||""}\n`);
+      }
     });
   }
-  download(`placements_${y}_${pad(m)}.csv`,out);
+  download("placements_"+y+"_"+pad(m)+".csv", out);
 }
-const csvEsc = s=>!s?"":(/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s);
-
-function importCSVFile(file){
-  const r=new FileReader(); r.onload=()=>applyPlacementsCSV(r.result); r.readAsText(file);
-}
-function applyPlacementsCSV(text){
-  const lines=text.replace(/\r/g,"").split("\n").filter(x=>x.trim().length>0);
-  if(!lines.length){ msg("Empty CSV"); return; }
-  const head=lines.shift().split(",").map(s=>s.trim().replace(/^"|"$/g,""));
-  const idx={year:head.indexOf("year"),month:head.indexOf("month"),date:head.indexOf("date"),day:head.indexOf("day"),slot:head.indexOf("slot"),title:head.indexOf("title"),bg:head.indexOf("bg"),font:head.indexOf("font")};
-  if(idx.year<0||idx.month<0||(idx.date<0&&idx.day<0)||idx.slot<0||idx.title<0){ msg("CSV needs columns: year, month, (date OR day), slot, title [, bg, font]"); return; }
-
-  for(const ln of lines){
-    const cells = ln.match(/"((?:[^"]|"")*)"|[^,]+/g)?.map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"'))||[];
-    if(!cells.length) continue;
-    const y=+cells[idx.year], m=+cells[idx.month], slot=(cells[idx.slot]||"AM").toUpperCase();
-    const title=(cells[idx.title]||"").trim(); if(!title) continue;
-    let ds="";
-    if(idx.date>-1){
-      const raw=(cells[idx.date]||"").trim();
-      ds = /^\d{4}-\d{1,2}-\d{1,2}$/.test(raw) ? raw : dstr(y,m,+raw);
-    }else{
-      ds = dstr(y,m,+cells[idx.day]);
-    }
-    const bg=(cells[idx.bg]||"#ffffff").trim(), font=(cells[idx.font]||"#000000").trim();
-    const k=ensureMonth(y,m); if(!state.months[k][ds]) state.months[k][ds]={AM:[],PM:[],EXTRA:[]};
-    if(slot==="AM"||slot==="PM") state.months[k][ds][slot].push({title,bg,font});
-    else state.months[k][ds].EXTRA.push({title,bg,font});
-  }
-  save(); refreshActiveView(); ok("Spreadsheet imported.");
+function csvEscape(s){ if(!s) return ""; if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"'; return s; }
+function download(name,text){
+  const a=el("a",{href:"data:text/plain;charset=utf-8,"+encodeURIComponent(text),download:name}); document.body.append(a); a.click(); a.remove();
 }
 
 function exportMonthHTML(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const w=window.open("","_blank");
-  const title=`${MONTHS[m-1]} ${y} — Outage Planner`;
-  const cont=$("#monthView").innerHTML;
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const w = window.open("","_blank");
+  const title = `${MONTHS[m-1]} ${y} — Outage Planner`;
+  const cont = $("#monthView").innerHTML;
   w.document.write(`<!doctype html><meta charset="utf-8"><title>${title}</title>
   <style>
     body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111;margin:16px}
     .weekdays,.weekgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
     .badge{padding:2px 6px;border:1px solid #ccc;border-radius:999px;font-size:12px;text-align:center}
-    .day{border:1px solid #ccc;border-radius:10px;min-height:120px;padding:8px;background:#fff;position:relative}
+    .day{border:1px solid #ccc;border-radius:10px;min-height:120px;padding:8px;background:#fff}
     .date{position:absolute;top:6px;right:8px;font-size:12px;color:#555}
     .slot{border:1px dashed #ddd;border-radius:8px;padding:6px;min-height:38px;margin-top:8px;background:#fafafa}
     .entry{margin-top:4px;padding:4px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;font-weight:600}
@@ -1559,187 +583,152 @@ function exportMonthHTML(){
   w.document.close();
 }
 
-function printMonth(){ window.print(); }
-
-/* ---------- Backup / Restore JSON ---------- */
-function backupJSON(){
-  const blob = JSON.stringify(state,null,2);
-  download(`outagePlanner_state_${Date.now()}.json`,blob,"application/json");
-}
-function restoreJSON(file){
-  const r=new FileReader(); r.onload=()=>{
-    try{
-      const obj=JSON.parse(r.result);
-      if(!obj || typeof obj!=="object") throw 0;
-      state=obj; save(); buildSelectors(true); refreshEverything(); ok("Schedule restored.");
-    }catch(e){ msg("Not a valid backup file."); }
-  }; r.readAsText(file);
+function importCSVText(text){ applyCSV(text); }
+function importCSVFile(file){
+  const r = new FileReader();
+  r.onload = () => applyCSV(r.result);
+  r.readAsText(file);
 }
 
-/* ---------- Filters wiring ---------- */
-function setFilter(mode,custom=""){
-  state.filter.mode=mode; state.filter.custom=custom; save(); refreshActiveView();
+// Accepts date (YYYY-MM-DD) OR day (1..31)
+function applyCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  if(!lines.length) { msg("Empty CSV"); return; }
+  const head = lines.shift().split(",").map(s=>s.trim().replace(/^"|"$/g,""));
+  const idx = {
+    year: head.indexOf("year"),
+    month: head.indexOf("month"),
+    date: head.indexOf("date"),
+    day:  head.indexOf("day"),
+    slot: head.indexOf("slot"),
+    title:head.indexOf("title"),
+    bg:   head.indexOf("bg"),
+    font: head.indexOf("font")
+  };
+  if(idx.year<0||idx.month<0||(idx.date<0&&idx.day<0)||idx.slot<0||idx.title<0){
+    msg("CSV needs columns: year, month, (date OR day), slot, title [, bg, font]"); return;
+  }
+
+  // clear current month store (we'll refill any months we touch)
+  state.months = state.months || {};
+
+  for(const ln of lines){
+    if(!ln.trim()) continue;
+    const cells = ln.match(/"((?:[^"]|"")*)"|[^,]+/g).map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"'));
+    const y = Number(cells[idx.year]), m = Number(cells[idx.month]);
+    const slot = (cells[idx.slot]||"AM").toUpperCase();
+    const title = (cells[idx.title]||"").trim();
+    if(!title){ continue; }
+
+    // build date string
+    let ds = "";
+    if(idx.date>-1){
+      const raw = cells[idx.date].trim();
+      if(/^\d{4}-\d{1,2}-\d{1,2}$/.test(raw)) ds = raw;
+      else if(/^\d{1,2}$/.test(raw)) ds = dstr(y,m,Number(raw));
+      else continue;
+    }else{
+      const day = Number(cells[idx.day]); ds = dstr(y,m,day);
+    }
+
+    let bg = (cells[idx.bg]||"").trim();
+    let font = (cells[idx.font]||"").trim().toLowerCase();
+    if(!bg) bg = "#ffffff";
+    if(!font) font = "#000000";
+
+    // ensure store and push
+    const k = ensureMonth(state,y,m);
+    if(!state.months[k][ds]) state.months[k][ds] = {AM:[],PM:[],EXTRA:[]};
+
+    if(slot==="AM"||slot==="PM") state.months[k][ds][slot].push({title,bg,font});
+    else state.months[k][ds].EXTRA.push({title,bg,font});
+  }
+
+  save(); renderMonth(); renderTable(); msg("Seeded from pasted CSV.");
 }
 
-/* ---------- Tabs & active view ---------- */
-let activeView="month";
-function setActiveView(v){
-  activeView=v;
-  $("#tabMonth").classList.toggle("active",v==="month");
-  $("#tabWeek").classList.toggle("active",v==="week");
-  $("#tabYear").classList.toggle("active",v==="year");
-  $("#tabTable").classList.toggle("active",v==="table");
-  show($("#monthView"), v==="month");
-  show($("#weekView"), v==="week");
-  show($("#yearView"), v==="year");
-  show($("#tableView"), v==="table");
-}
-function refreshActiveView(){
-  if(activeView==="month") renderMonth();
-  else if(activeView==="week") renderWeek();
-  else if(activeView==="year") renderYear();
-  else renderTable();
-}
-function refreshEverything(){
-  renderMonth(); renderTable();
-  if(activeView==="week") renderWeek();
-  if(activeView==="year") renderYear();
+// ---------- Repeat tools ----------
+function copyMonthToAllMonths(){
+  const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+  const k = ensureMonth(state,y,m);
+  const src = JSON.parse(JSON.stringify(state.months[k]||{}));
+  for(let mm=1; mm<=12; mm++){
+    if(mm===m) continue;
+    const k2 = ensureMonth(state,y,mm);
+    // clear weekdays then copy placement dates matching weekday positions
+    state.months[k2] = JSON.parse(JSON.stringify(src));
+  }
+  save(); msg("Copied to all months of "+y); renderMonth(); renderTable();
 }
 
-/* ---------- Build selectors & buttons ---------- */
-function buildSelectors(skipSet=false){
-  const ys=$("#yearSel"), ms=$("#monthSel");
+function copyYearToRange(fromYear, startYear, endYear){
+  for(let y=startYear; y<=endYear; y++){
+    if(y===fromYear) continue;
+    for(let m=1; m<=12; m++){
+      const kFrom = ensureMonth(state, fromYear, m);
+      const kTo   = ensureMonth(state, y, m);
+      state.months[kTo] = JSON.parse(JSON.stringify(state.months[kFrom]||{}));
+    }
+  }
+  save(); msg(`Copied ${fromYear} → ${startYear}-${endYear}`); renderMonth(); renderTable();
+}
+
+// ---------- UI wiring / boot ----------
+function buildSelectors(){
+  const ys = $("#yearSel"), ms=$("#monthSel");
   ys.innerHTML=""; ms.innerHTML="";
-  for(let y=2024;y<=2032;y++) ys.append(el("option",{value:y,textContent:y}));
-  for(let m=1;m<=12;m++) ms.append(el("option",{value:m,textContent:MONTHS[m-1]}));
-  ys.value = String(state.year || new Date().getFullYear());
-  ms.value = String(state.month || (new Date().getMonth()+1));
-  ys.addEventListener("change",()=>{ state.year=+ys.value; save(); refreshEverything(); });
-  ms.addEventListener("change",()=>{ state.month=+ms.value; save(); refreshEverything(); });
-  if(!skipSet){ state.year=+ys.value; state.month=+ms.value; save(); }
+  for(let y=2024; y<=2032; y++) ys.append(el("option",{value:y,textContent:y}));
+  for(let m=1; m<=12; m++) ms.append(el("option",{value:m,textContent:MONTHS[m-1]}));
+  ys.value = state.year || new Date().getFullYear();
+  ms.value = state.month || (new Date().getMonth()+1);
+  ys.addEventListener("change", ()=>{ state.year=Number(ys.value); save(); renderMonth(); renderTable(); });
+  ms.addEventListener("change", ()=>{ state.month=Number(ms.value); save(); renderMonth(); renderTable(); });
 }
 
 function bindButtons(){
-  // Tabs
-  $("#tabMonth").addEventListener("click",()=>{ renderMonth(); setActiveView("month"); });
-  $("#tabWeek").addEventListener("click",()=>{ renderWeek(); });
-  $("#tabYear").addEventListener("click",()=>{ renderYear(); });
-  $("#tabTable").addEventListener("click",()=>{ renderTable(); setActiveView("table"); });
+  $("#tabMonth").addEventListener("click",()=>{ $("#tabMonth").classList.add("active"); $("#tabTable").classList.remove("active"); $("#monthView").style.display="block"; $("#tableView").style.display="none"; });
+  $("#tabTable").addEventListener("click",()=>{ $("#tabTable").classList.add("active"); $("#tabMonth").classList.remove("active"); $("#tableView").style.display="block"; $("#monthView").style.display="none"; });
 
-  // Palette
-  $("#btnAdd").addEventListener("click", addPaletteItem);
-  $("#btnEditPalette").addEventListener("click", (e)=>{
-    editMode = !editMode; e.currentTarget.setAttribute("aria-pressed", String(editMode));
-    e.currentTarget.textContent = editMode ? "Done" : "Edit Tasks";
-    refreshPalette();
-  });
-  $("#paletteSearch").addEventListener("input", refreshPalette);
-  $("#btnApplyRepeat").addEventListener("click", applyRepeat);
-
-  // Scheduling
-  $("#btnCopyMonth").addEventListener("click", ()=>{
-    openConfirm(`Copy this month to all months of ${$("#yearSel").value}?`, copyMonthToAllMonths);
-  });
-  $("#btnCopyYears").addEventListener("click", ()=>{
-    const y=+$("#yearSel").value;
-    openPrompt(`Copy entire ${y} schedule to which year range? (e.g. 2026-2030)`, (ans)=>{
-      const m=ans?.match?.(/^(\d{4})\s*-\s*(\d{4})$/); if(!m){ msg("Use format YYYY-YYYY"); return; }
-      const s=+m[1], e=+m[2]; if(s>e){ msg("Start year must be ≤ end year"); return; }
-      copyYearToRange(y,s,e); ok(`Copied ${y} → ${s}-${e}`);
-    });
-  });
-
-  // Data
-  $("#btnBackup").addEventListener("click", backupJSON);
-  $("#btnRestore").addEventListener("click", ()=> $("#restoreFile").click());
-  $("#restoreFile").addEventListener("change", e=>{ if(e.target.files?.[0]) restoreJSON(e.target.files[0]); });
-
-  // Share & Print
-  $("#btnPrintMonth").addEventListener("click", printMonth);
-  $("#btnShareHtml").addEventListener("click", exportMonthHTML);
+  $("#btnCopyMonth").addEventListener("click", copyMonthToAllMonths);
+  $("#btnExportHtml").addEventListener("click", exportMonthHTML);
   $("#btnExportCSV").addEventListener("click", exportCSV);
-  $("#btnImportCSV").addEventListener("click", ()=>$("#importFile").click());
-  $("#importFile").addEventListener("change", e=>{ if(e.target.files?.[0]) importCSVFile(e.target.files[0]); });
-
-  // Filters
-  $("#fltAll").addEventListener("click", ()=>setFilter("all"));
-  $("#fltPreventive").addEventListener("click", ()=>setFilter("preventive"));
-  $("#fltRun").addEventListener("click", ()=>setFilter("run"));
-  $("#fltCustom").addEventListener("click", ()=>{
-    openCustomFilter(state.filter.custom||"", (val)=>setFilter("custom",val));
+  $("#btnImportCSV").addEventListener("click", ()=>$("#fileImport").click());
+  $("#fileImport").addEventListener("change", e=>{ if(e.target.files?.[0]) importCSVFile(e.target.files[0]); });
+  $("#btnReset").addEventListener("click", ()=>{
+    const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
+    state.months[keyFor(y,m)] = {}; save(); renderMonth(); renderTable();
   });
 
-  // Cleanup
-  $("#btnClearMonth").addEventListener("click", ()=>{
-    openConfirm("Clear all placements for this month?", ()=>{
-      const y=+$("#yearSel").value, m=+$("#monthSel").value;
-      state.months[keyFor(y,m)]={}; save(); refreshEverything(); ok("Month cleared.");
-    });
+  // Seed modal
+  const modal=$("#seedModal"), openSeed=()=>modal.style.display="flex", closeSeed=()=>modal.style.display="none";
+  $("#btnSeedCSV").addEventListener("click", openSeed);
+  $("#seedCancel").addEventListener("click", closeSeed);
+  $("#seedApply").addEventListener("click", ()=>{
+    const text=$("#seedText").value.trim(); if(!text){ closeSeed(); return; }
+    applyCSV(text); closeSeed(); msg("Seeded from pasted CSV.");
   });
-  $("#btnResetAll").addEventListener("click", ()=>{
-    openConfirm("Are you sure you want to reset EVERYTHING? This cannot be undone.", ()=>{
-      state.months={}; save(); refreshEverything(); ok("All months cleared.");
-    });
+
+  // Copy year → range
+  $("#btnCopyYearRange").addEventListener("click", ()=>{
+    const y = Number($("#yearSel").value);
+    const ans = prompt(`Copy the entire ${y} schedule to which year range? (e.g. 2026-2030)`,"2026-2030");
+    if(!ans) return;
+    const m = ans.match(/^(\d{4})\s*-\s*(\d{4})$/);
+    if(!m){ msg("Use format YYYY-YYYY"); return; }
+    const startY=Number(m[1]), endY=Number(m[2]);
+    if(startY>endY){ msg("Start year must be ≤ end year"); return; }
+    copyYearToRange(y,startY,endY);
   });
 }
 
-/* ---------- Copy helpers ---------- */
-function copyMonthToAllMonths(){
-  const y=+$("#yearSel").value, m=+$("#monthSel").value;
-  const k=ensureMonth(y,m);
-  const src=JSON.parse(JSON.stringify(state.months[k]||{}));
-  for(let mm=1;mm<=12;mm++){
-    if(mm===m) continue;
-    const k2=ensureMonth(y,mm);
-    state.months[k2]=JSON.parse(JSON.stringify(src));
-  }
-  save(); refreshEverything(); ok("Copied to all months.");
-}
-function copyYearToRange(fromY,startY,endY){
-  for(let y=startY;y<=endY;y++){
-    if(y===fromY) continue;
-    for(let m=1;m<=12;m++){
-      const kFrom=ensureMonth(fromY,m), kTo=ensureMonth(y,m);
-      state.months[kTo]=JSON.parse(JSON.stringify(state.months[kFrom]||{}));
-    }
-  }
-  save(); refreshEverything();
-}
-
-/* ---------- Modal helpers ---------- */
-function openConfirm(text,onOk){
-  const m=$("#modalPrompt"); $("#modalTitle").textContent="Confirm"; $("#modalText").textContent=text;
-  const okBtn=$("#modalOk"), cancel=$("#modalCancel");
-  const cleanup=()=>{ okBtn.onclick=null; cancel.onclick=null; show(m,false); };
-  okBtn.onclick=()=>{ cleanup(); onOk?.(); };
-  cancel.onclick=cleanup; show(m,true);
-}
-function openPrompt(text,onOk){
-  const m=$("#modalPrompt"); $("#modalTitle").textContent="Input"; $("#modalText").textContent=text;
-  const okBtn=$("#modalOk"), cancel=$("#modalCancel");
-  const cleanup=()=>{ okBtn.onclick=null; cancel.onclick=null; show(m,false); };
-  okBtn.onclick=()=>{ cleanup(); const ans=prompt(text,"2026-2030"); if(ans!=null) onOk(ans); };
-  cancel.onclick=cleanup; show(m,false);
-}
-function openCustomFilter(defaultVal,onApply){
-  const m=$("#modalCustom"); const input=$("#customFilterInput"); input.value=defaultVal||"";
-  $("#customApply").onclick=()=>{ const v=input.value.trim(); show(m,false); onApply?.(v); };
-  $("#customCancel").onclick=()=>show(m,false);
-  show(m,true); input.focus();
-}
-
-/* ---------- Boot ---------- */
 function boot(){
   buildSelectors();
-  bindButtons();
-  fillRepeatOptions();
   refreshPalette();
+  bindButtons();
   renderMonth();
-  setActiveView("month");
   renderTable();
 }
 document.addEventListener("DOMContentLoaded", boot);
 </script>
 </body>
 </html>
-
