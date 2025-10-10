@@ -686,6 +686,45 @@ function setActiveView(which){
 }
 
 // ===== export/import (kept) =====
+  // ----- Data: Back up / Restore JSON -----
+function backupJSON(){
+  // Download the entire app state (including palette and all months) as a .json
+  const json = JSON.stringify(state, null, 2);
+  const fname = `outagePlanner_backup_${new Date().toISOString().slice(0,10)}.json`;
+  const a = document.createElement("a");
+  a.href = "data:application/json;charset=utf-8," + encodeURIComponent(json);
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+function restoreJSON(file){
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const obj = JSON.parse(r.result);
+      // basic shape check
+      if(!obj || typeof obj !== "object" || !("palette" in obj) || !("months" in obj)){
+        msg("Invalid backup file.");
+        return;
+      }
+      state = obj;               // replace whole state
+      save();
+      buildSelectors();          // repopulate Year/Month dropdowns
+      refreshPalette();          // rebuild palette list
+      renderMonth();             // show month view immediately
+      renderTable();             // refresh table cache
+      setActiveView("month");
+      msg("Schedule restored.");
+    }catch(e){
+      console.error(e);
+      msg("Failed to read backup JSON.");
+    }
+  };
+  r.readAsText(file);
+}
+
 function csvEscape(s){ if(!s) return ""; if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"'; return s; }
 function download(name,text){
   const a=el("a",{href:"data:text/plain;charset=utf-8,"+encodeURIComponent(text),download:name}); document.body.append(a); a.click(); a.remove();
