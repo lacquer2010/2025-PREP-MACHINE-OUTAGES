@@ -730,5 +730,30 @@ function boot(){
 }
 document.addEventListener("DOMContentLoaded", boot);
 </script>
+  <!-- Add Task Modal -->
+<div id="taskModal" hidden>
+  <div class="modal-card">
+    <h3>Add New Task</h3>
+    <form id="taskForm">
+      <label>Title:
+        <input id="taskTitle" type="text" required placeholder="e.g., PGI C">
+      </label>
+      <div class="row">
+        <label>Background color:
+          <input id="taskBg" type="text" value="#B7DEE4" pattern="#[0-9a-fA-F]{6}">
+        </label>
+        <label>Font color:
+          <input id="taskFont" type="text" value="#000000" pattern="#[0-9a-fA-F]{6}">
+        </label>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn primary">Create</button>
+        <button type="button" id="taskCancel" class="btn">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>
 </body>
 </html>
