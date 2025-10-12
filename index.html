@@ -208,26 +208,24 @@ summary{cursor:pointer}
     </label>
 
     <div style="display:flex;gap:12px;margin-top:8px">
-      <label style="flex:1">Background
-        <input id="taskBg" value="#B7DEE4" placeholder="#RRGGBB">
+      <label style="flex:1">Font
+  <input id="taskFont" value="#000000" placeholder="#RRGGBB">
 
-        <div class="swatches" id="bgSwatches" aria-label="Preset colors">
-          <button type="button" data-hex="#B7DEE4" style="--c:#B7DEE4" title="Ice Blue"></button>
-          <button type="button" data-hex="#B1A0C7" style="--c:#B1A0C7" title="Lavender"></button>
-          <button type="button" data-hex="#C9DAF8" style="--c:#C9DAF8" title="Sky"></button>
-          <button type="button" data-hex="#FEE2E2" style="--c:#FEE2E2" title="Rose"></button>
-          <button type="button" data-hex="#FDE68A" style="--c:#FDE68A" title="Sun"></button>
-          <button type="button" data-hex="#D1FAE5" style="--c:#D1FAE5" title="Mint"></button>
-          <button type="button" data-hex="#E9D5FF" style="--c:#E9D5FF" title="Lilac"></button>
-          <button type="button" data-hex="#FFE4B5" style="--c:#FFE4B5" title="Peach"></button>
-          <button type="button" data-hex="#E0E7FF" style="--c:#E0E7FF" title="Periwinkle"></button>
-          <button type="button" data-hex="#F5F5F5" style="--c:#F5F5F5" title="Light Gray"></button>
-        </div>
+  <!-- New font color presets -->
+  <div class="swatches" id="fontSwatches" aria-label="Font color">
+    <button type="button" data-hex="#000000" style="--c:#000000" title="Black"></button>
+    <button type="button" data-hex="#FF0000" style="--c:#FF0000" title="Red"></button>
+  </div>
 
-        <div class="inline-note">Pick a preset or choose any color:</div>
-        <input id="taskBgPicker" type="color" value="#B7DEE4">
-      </label>
+  <label class="inline-note" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+    <input id="fontAuto" type="checkbox" checked> Auto choose black/white
+  </label>
 
+  <!-- Bold option -->
+  <label class="inline-note" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+    <input id="fontBold" type="checkbox"> Bold text
+  </label>
+</label>
       <label style="flex:1">Font
         <input id="taskFont" value="#000000" placeholder="#RRGGBB">
         <label class="inline-note" style="display:flex;gap:6px;align-items:center;margin-top:6px">
@@ -545,6 +543,7 @@ function refreshPalette(){
     const chip = el("div",{className:"taskchip",draggable:true});
     const cb = el("div",{className:"colorbox"}); cb.style.background = p.bg || "#fff";
     const name = el("div",{textContent:p.title});
+    name.style.fontWeight = p.bold ? "700" : "400";
     chip.append(cb, name, el("span",{className:"badge",textContent:p.font||"#000000"}));
     chip.addEventListener("dragstart", e=>{
       e.dataTransfer.setData("text/plain", JSON.stringify({type:"palette", title:p.title, bg:p.bg, font:p.font}));
@@ -733,14 +732,15 @@ function autoFont(hex){
 $("#taskCreate")?.addEventListener("click", ()=>{
   const title = (taskTitleEl?.value||"").trim();
   if(fontAuto?.checked) { $("#taskFont").value = ""; }       // allow auto font
-  let   bg    = (taskBgEl?.value||"#B7DEE4").trim().toUpperCase();
-  let   font  = (taskFontEl?.value||"").trim().toUpperCase();
+  let bg = (taskBgEl?.value||"#B7DEE4").trim().toUpperCase();
+  let font = (taskFontEl?.value||"").trim().toUpperCase();
+  const bold = fontBold?.checked || false;                   // ✅ new line here
 
   if(!title){ msg("Title required"); return; }
   if(!/^#[0-9A-F]{6}$/.test(bg)){ msg("Background must be #RRGGBB"); return; }
   if(!/^#[0-9A-F]{6}$/.test(font)) font = autoFont(bg);
 
-  const item = { title, bg, font };
+  const item = { title, bg, font, bold };
   const idx = state.palette.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
   if(idx >= 0) state.palette[idx] = item; else state.palette.push(item);
 
@@ -776,6 +776,21 @@ bgPicker?.addEventListener("input", (e)=>{
   save(); renderMonth(); renderTable(); msg("Seeded from pasted CSV.");
 }
 
+// ---- Font color + Bold wiring ----
+const fontSwatches = $("#fontSwatches");
+const fontBold = $("#fontBold");
+
+fontSwatches?.addEventListener("click", (e)=>{
+  const btn = e.target.closest("button[data-hex]");
+  if(!btn) return;
+  $("#taskFont").value = btn.dataset.hex.toUpperCase();
+});
+
+function applyFontStyle(chip, fontHex, bold){
+  chip.style.color = fontHex;
+  chip.style.fontWeight = bold ? "700" : "400";
+}
+  
 // ---------- Repeat tools ----------
 function copyMonthToAllMonths(){
   const y = Number($("#yearSel").value), m = Number($("#monthSel").value);
@@ -841,6 +856,7 @@ $("#taskCreate")?.addEventListener("click", ()=>{
   if(!/^#[0-9A-F]{6}$/.test(font)) font = autoFont(bg);
 
   const item = { title, bg, font };
+  const bold = fontBold?.checked || false;
 
   // replace if same title exists, else push
   const idx = state.palette.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
