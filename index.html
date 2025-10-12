@@ -66,9 +66,16 @@ summary{cursor:pointer}
 
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
 .modal .inner{background:#fff;border:1px solid var(--ring);border-radius:12px;max-width:760px;width:100%;padding:12px;color:#0b0f14}
+
+.swatches{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.swatches button{width:24px;height:24px;border-radius:6px;border:1px solid var(--ring,#d6d9e0);background:var(--c);cursor:pointer}
+.swatches button:focus{outline:2px solid var(--accent,#2563eb);outline-offset:2px}
+.inline-note{font-size:.8rem;color:var(--muted,#586173)}
+
 </style>
 </head>
 
+  
 <body>
 <div class="wrap">
   <h1>Outage Planner</h1>
@@ -119,6 +126,7 @@ summary{cursor:pointer}
         <strong>Task palette</strong>
         <div style="display:flex;gap:6px">
           <button id="btnAddTask">+ Add</button>
+          
           <button id="btnEditPalette">Edit palette</button>
         </div>
       </header>
@@ -199,12 +207,32 @@ summary{cursor:pointer}
       <input id="taskTitle" placeholder="e.g., PGI C">
     </label>
 
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <label style="flex:1">Background<br>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <label style="flex:1">Background
         <input id="taskBg" value="#B7DEE4" placeholder="#RRGGBB">
+
+        <div class="swatches" id="bgSwatches" aria-label="Preset colors">
+          <button type="button" data-hex="#B7DEE4" style="--c:#B7DEE4" title="Ice Blue"></button>
+          <button type="button" data-hex="#B1A0C7" style="--c:#B1A0C7" title="Lavender"></button>
+          <button type="button" data-hex="#C9DAF8" style="--c:#C9DAF8" title="Sky"></button>
+          <button type="button" data-hex="#FEE2E2" style="--c:#FEE2E2" title="Rose"></button>
+          <button type="button" data-hex="#FDE68A" style="--c:#FDE68A" title="Sun"></button>
+          <button type="button" data-hex="#D1FAE5" style="--c:#D1FAE5" title="Mint"></button>
+          <button type="button" data-hex="#E9D5FF" style="--c:#E9D5FF" title="Lilac"></button>
+          <button type="button" data-hex="#FFE4B5" style="--c:#FFE4B5" title="Peach"></button>
+          <button type="button" data-hex="#E0E7FF" style="--c:#E0E7FF" title="Periwinkle"></button>
+          <button type="button" data-hex="#F5F5F5" style="--c:#F5F5F5" title="Light Gray"></button>
+        </div>
+
+        <div class="inline-note">Pick a preset or choose any color:</div>
+        <input id="taskBgPicker" type="color" value="#B7DEE4">
       </label>
-      <label style="flex:1">Font<br>
+
+      <label style="flex:1">Font
         <input id="taskFont" value="#000000" placeholder="#RRGGBB">
+        <label class="inline-note" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+          <input id="fontAuto" type="checkbox" checked> Auto choose black/white
+        </label>
       </label>
     </div>
 
@@ -214,6 +242,7 @@ summary{cursor:pointer}
     </div>
   </div>
 </div>
+  
   
 <!-- ========== APP LOGIC ========== -->
 <script>
@@ -671,6 +700,78 @@ function applyCSV(text){
     if(slot==="AM"||slot==="PM") state.months[k][ds][slot].push({title,bg,font});
     else state.months[k][ds].EXTRA.push({title,bg,font});
   }
+
+  // ---- Add Task modal ----
+const taskModal   = $("#taskModal");
+const taskTitleEl = $("#taskTitle");
+const taskBgEl    = $("#taskBg");
+const taskFontEl  = $("#taskFont");
+
+function openTaskModal(){
+  if(taskTitleEl) taskTitleEl.value = "";
+  if(taskBgEl)    taskBgEl.value    = "#B7DEE4";
+  if(taskFontEl)  taskFontEl.value  = "#000000";
+  taskModal.style.display = "flex";
+  setTimeout(()=>taskTitleEl?.focus(), 0);
+}
+function closeTaskModal(){ taskModal.style.display = "none"; }
+
+$("#btnAddTask")?.addEventListener("click", openTaskModal);
+$("#taskCancel")?.addEventListener("click", closeTaskModal);
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape" && taskModal.style.display==="flex") closeTaskModal();
+});
+
+function autoFont(hex){
+  const h = (hex||"").replace("#","");
+  if(h.length!==6) return "#000000";
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  const L=(0.299*r+0.587*g+0.114*b)/255;
+  return L>0.6 ? "#000000" : "#FFFFFF";
+}
+
+$("#taskCreate")?.addEventListener("click", ()=>{
+  const title = (taskTitleEl?.value||"").trim();
+  if(fontAuto?.checked) { $("#taskFont").value = ""; }       // allow auto font
+  let   bg    = (taskBgEl?.value||"#B7DEE4").trim().toUpperCase();
+  let   font  = (taskFontEl?.value||"").trim().toUpperCase();
+
+  if(!title){ msg("Title required"); return; }
+  if(!/^#[0-9A-F]{6}$/.test(bg)){ msg("Background must be #RRGGBB"); return; }
+  if(!/^#[0-9A-F]{6}$/.test(font)) font = autoFont(bg);
+
+  const item = { title, bg, font };
+  const idx = state.palette.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
+  if(idx >= 0) state.palette[idx] = item; else state.palette.push(item);
+
+  save();
+  refreshPalette();
+  closeTaskModal();
+  msg(`Task “${title}” saved to palette.`);
+});
+
+// ---- Preset color wiring ----
+const bgSwatches = $("#bgSwatches");
+const bgPicker   = $("#taskBgPicker");
+const fontAuto   = $("#fontAuto");
+
+function setBg(hex){
+  $("#taskBg").value = hex.toUpperCase();
+  if(fontAuto?.checked){
+    $("#taskFont").value = autoFont(hex.toUpperCase());
+  }
+  if(bgPicker) bgPicker.value = hex;
+}
+
+bgSwatches?.addEventListener("click", (e)=>{
+  const btn = e.target.closest("button[data-hex]");
+  if(!btn) return;
+  setBg(btn.dataset.hex);
+});
+
+bgPicker?.addEventListener("input", (e)=>{
+  setBg(e.target.value);
+});
 
   save(); renderMonth(); renderTable(); msg("Seeded from pasted CSV.");
 }
