@@ -118,7 +118,7 @@ summary{cursor:pointer}
       <header>
         <strong>Task palette</strong>
         <div style="display:flex;gap:6px">
-          <button id="btnAdd">+ Add</button>
+          <button id="btnAddTask">+ Add</button>
           <button id="btnEditPalette">Edit palette</button>
         </div>
       </header>
@@ -187,6 +187,34 @@ summary{cursor:pointer}
   </div>
 </div>
 
+  <!-- Add Task Modal -->
+<div id="taskModal" class="modal">
+  <div class="inner">
+    <h3>Add task</h3>
+    <p style="margin-top:0"><small class="muted">
+      Title is required. Colors are hex like <b>#B7DEE4</b>.
+    </small></p>
+
+    <label>Title<br>
+      <input id="taskTitle" placeholder="e.g., PGI C">
+    </label>
+
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <label style="flex:1">Background<br>
+        <input id="taskBg" value="#B7DEE4" placeholder="#RRGGBB">
+      </label>
+      <label style="flex:1">Font<br>
+        <input id="taskFont" value="#000000" placeholder="#RRGGBB">
+      </label>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="taskCancel">Cancel</button>
+      <button id="taskCreate" class="primary">Create</button>
+    </div>
+  </div>
+</div>
+  
 <!-- ========== APP LOGIC ========== -->
 <script>
 const $ = sel => document.querySelector(sel);
@@ -673,6 +701,57 @@ function copyYearToRange(fromYear, startYear, endYear){
   save(); msg(`Copied ${fromYear} → ${startYear}-${endYear}`); renderMonth(); renderTable();
 }
 
+  // ---- Add Task modal ----
+const taskModal   = $("#taskModal");
+const taskTitleEl = $("#taskTitle");
+const taskBgEl    = $("#taskBg");
+const taskFontEl  = $("#taskFont");
+
+function openTaskModal(){
+  if(taskTitleEl) taskTitleEl.value = "";
+  if(taskBgEl)    taskBgEl.value    = "#B7DEE4";
+  if(taskFontEl)  taskFontEl.value  = "#000000";
+  taskModal.style.display = "flex";
+  setTimeout(()=>taskTitleEl?.focus(), 0);
+}
+function closeTaskModal(){ taskModal.style.display = "none"; }
+
+$("#btnAddTask")?.addEventListener("click", openTaskModal);
+$("#taskCancel")?.addEventListener("click", closeTaskModal);
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape" && taskModal.style.display==="flex") closeTaskModal();
+});
+
+function autoFont(hex){
+  const h = (hex||"").replace("#","");
+  if(h.length!==6) return "#000000";
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  const L=(0.299*r+0.587*g+0.114*b)/255;
+  return L>0.6 ? "#000000" : "#FFFFFF";
+}
+
+$("#taskCreate")?.addEventListener("click", ()=>{
+  const title = (taskTitleEl?.value||"").trim();
+  let   bg    = (taskBgEl?.value||"#B7DEE4").trim().toUpperCase();
+  let   font  = (taskFontEl?.value||"").trim().toUpperCase();
+
+  if(!title){ msg("Title required"); return; }
+  if(!/^#[0-9A-F]{6}$/.test(bg)){ msg("Background must be #RRGGBB"); return; }
+  if(!/^#[0-9A-F]{6}$/.test(font)) font = autoFont(bg);
+
+  const item = { title, bg, font };
+
+  // replace if same title exists, else push
+  const idx = state.palette.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
+  if(idx >= 0) state.palette[idx] = item;
+  else state.palette.push(item);
+
+  save();               // your existing save()
+  refreshPalette();     // rebuild chips + repeat dropdown
+  closeTaskModal();
+  msg(`Task “${title}” saved to palette.`);
+});
+  
 // ---------- UI wiring / boot ----------
 function buildSelectors(){
   const ys = $("#yearSel"), ms=$("#monthSel");
